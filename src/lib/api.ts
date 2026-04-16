@@ -78,6 +78,8 @@ type CreateProductPayload = {
   variants: CreateVariantPayload[];
 };
 
+type UpdateProductPayload = Partial<Omit<CreateProductPayload, "variants">>;
+
 export const productsApi = {
   list: async () => {
     const { data } = await api.get<Product[]>("/products");
@@ -90,6 +92,13 @@ export const productsApi = {
   create: async (payload: CreateProductPayload) => {
     const { data } = await api.post<Product>("/products", payload);
     return data;
+  },
+  update: async (id: string, payload: UpdateProductPayload) => {
+    const { data } = await api.patch<Product>(`/products/${id}`, payload);
+    return data;
+  },
+  delete: async (id: string) => {
+    await api.delete(`/products/${id}`);
   },
   quickBuy: async (productId: string, payload: { variantId: string; quantity: number }) => {
     const { data } = await api.post<QuickBuyResponse>(
