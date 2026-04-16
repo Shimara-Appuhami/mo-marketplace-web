@@ -23,3 +23,25 @@ export interface ApiErrorResponse {
   error?: string;
   statusCode?: number;
 }
+
+export interface ProductVariant {
+  id: string;
+  combinationKey: string;
+  attributes: Record<string, string>;
+  price: string;
+  stock: number;
+  sku: string;
+  createdAt: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  basePrice: string;
+  category: string;
+  imageUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  variants: ProductVariant[];
+}
