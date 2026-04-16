@@ -17,24 +17,24 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token;
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+    const token = useAuthStore.getState().token;
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  });
 
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      useAuthStore.getState().clearAuth();
-      if (typeof window !== "undefined" && window.location.pathname !== "/login") {
-        const next = `${window.location.pathname}${window.location.search}`;
-        window.location.href = `/login?${new URLSearchParams({ reason: "session-expired", next })}`;
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        useAuthStore.getState().clearAuth();
+        if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+          const next = `${window.location.pathname}${window.location.search}`;
+          window.location.href = `/login?${new URLSearchParams({ reason: "session-expired", next })}`;
+        }
       }
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
-  }
-);
+  );
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 export const authApi = {

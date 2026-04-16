@@ -47,14 +47,12 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
         )}
 
-        {/* BESTSELLER badge (top-right) – show for products with most variants */}
         {product.variants.length >= 4 && !outOfStock && (
           <span className="absolute right-3 top-3 z-10 rounded bg-orange-500 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm">
             Bestseller
           </span>
         )}
 
-        {/* OUT OF STOCK overlay */}
         {outOfStock && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
             <span className="rounded border border-white/50 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/90">
@@ -63,11 +61,9 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
-        {/* Hover shimmer */}
         <div className="absolute inset-0 bg-white/0 transition-all duration-300 group-hover:bg-white/5" />
       </div>
 
-      {/* ── Card footer ────────────────────────────────── */}
       <div className="pt-3">
         <div className="flex items-start justify-between gap-2">
           <h2 className="text-sm font-semibold leading-snug text-slate-900 transition-colors group-hover:text-slate-600">
