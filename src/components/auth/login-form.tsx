@@ -52,58 +52,64 @@ export function LoginForm({
       alternateHref="/register"
       alternateLabel="Need an account? Create one"
     >
-      {reason === "session-expired" ? (
-        <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      {reason === "session-expired" && (
+        <div className="mb-5 border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-800">
           Your session expired. Sign in again to continue.
         </div>
-      ) : null}
+      )}
 
       <form className="space-y-5" onSubmit={onSubmit}>
-        <div className="space-y-2">
+        
+        {/* Email */}
+        <div className="space-y-1">
           <label className="text-sm font-medium text-slate-700" htmlFor="email">
             Email
           </label>
           <input
             id="email"
             type="email"
-            autoComplete="email"
             placeholder="jane@example.com"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-200"
+            className="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-slate-900"
             {...register("email")}
           />
-          {errors.email ? <p className="text-sm text-rose-600">{errors.email.message}</p> : null}
+          {errors.email && (
+            <p className="text-xs text-rose-600">{errors.email.message}</p>
+          )}
         </div>
 
-        <div className="space-y-2">
+        {/* Password */}
+        <div className="space-y-1">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-slate-700" htmlFor="password">
               Password
             </label>
-            <Link href="/register" className="text-xs text-slate-500 transition hover:text-slate-950">
+            <Link href="/register" className="text-xs text-slate-500 hover:text-slate-900">
               Create account
             </Link>
           </div>
+
           <input
             id="password"
             type="password"
-            autoComplete="current-password"
             placeholder="Enter your password"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-200"
+            className="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-slate-900"
             {...register("password")}
           />
-          {errors.password ? (
-            <p className="text-sm text-rose-600">{errors.password.message}</p>
-          ) : null}
+          {errors.password && (
+            <p className="text-xs text-rose-600">{errors.password.message}</p>
+          )}
         </div>
 
+        {/* Button */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+          className="inline-flex w-full items-center justify-center gap-2 border border-slate-900 bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white hover:text-slate-900 disabled:opacity-50"
         >
           <LogIn className="size-4" />
           {isSubmitting ? "Signing in..." : "Sign in"}
         </button>
+
       </form>
     </AuthShell>
   );

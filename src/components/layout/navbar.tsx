@@ -21,7 +21,7 @@ export function Navbar() {
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <div className="flex items-center gap-6">
           <Link href="/products" className="text-lg font-semibold tracking-tight text-slate-950">
-            MO Marketplace
+            <img src="/favicon.ico" alt="MO Marketplace" className="size-8 object-contain" />
           </Link>
           <nav className="hidden items-center gap-4 text-sm text-slate-600 sm:flex">
             <Link href="/products" className="transition hover:text-slate-950">

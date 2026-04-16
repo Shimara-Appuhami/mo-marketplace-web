@@ -47,61 +47,64 @@ export function RegisterForm({ next = "/products" }: { next?: string }) {
       alternateLabel="Already have an account? Sign in"
     >
       <form className="space-y-5" onSubmit={onSubmit}>
-        <div className="space-y-2">
+        
+        {/* Name */}
+        <div className="space-y-1">
           <label className="text-sm font-medium text-slate-700" htmlFor="name">
             Full name
           </label>
           <input
             id="name"
             type="text"
-            autoComplete="name"
             placeholder="Jane Doe"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-200"
+            className="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-slate-900"
             {...register("name")}
           />
-          {errors.name ? <p className="text-sm text-rose-600">{errors.name.message}</p> : null}
+          {errors.name && <p className="text-xs text-rose-600">{errors.name.message}</p>}
         </div>
 
-        <div className="space-y-2">
+        {/* Email */}
+        <div className="space-y-1">
           <label className="text-sm font-medium text-slate-700" htmlFor="email">
             Email
           </label>
           <input
             id="email"
             type="email"
-            autoComplete="email"
             placeholder="jane@example.com"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-200"
+            className="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-slate-900"
             {...register("email")}
           />
-          {errors.email ? <p className="text-sm text-rose-600">{errors.email.message}</p> : null}
+          {errors.email && <p className="text-xs text-rose-600">{errors.email.message}</p>}
         </div>
 
-        <div className="space-y-2">
+        {/* Password */}
+        <div className="space-y-1">
           <label className="text-sm font-medium text-slate-700" htmlFor="password">
             Password
           </label>
           <input
             id="password"
             type="password"
-            autoComplete="new-password"
             placeholder="At least 8 characters"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-200"
+            className="w-full border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-slate-900"
             {...register("password")}
           />
-          {errors.password ? (
-            <p className="text-sm text-rose-600">{errors.password.message}</p>
-          ) : null}
+          {errors.password && (
+            <p className="text-xs text-rose-600">{errors.password.message}</p>
+          )}
         </div>
 
+        {/* Button */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+          className="inline-flex w-full items-center justify-center gap-2 border border-slate-900 bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white hover:text-slate-900 disabled:opacity-50"
         >
           <UserPlus className="size-4" />
           {isSubmitting ? "Creating account..." : "Create account"}
         </button>
+
       </form>
     </AuthShell>
   );

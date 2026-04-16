@@ -34,9 +34,10 @@ export function AuthShell({
   return (
     <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,#dbeafe_0%,#f8fafc_45%,#e2e8f0_100%)] px-4 py-12">
       <div className="w-full max-w-md rounded-[2rem] border border-white/70 bg-white/90 p-8 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.4)] backdrop-blur">
-        <div className="mb-8 space-y-3">
-          <span className="inline-flex rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-white">
-            MO Marketplace
+        <div className="mb-8 space-y-3 text-center">
+          <span className="mx-auto inline-flex size-14 items-center justify-center rounded-2xl bg-white">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/favicon.ico" alt="MO Marketplace" className="size-8 object-contain" />
           </span>
           <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
             {title}
