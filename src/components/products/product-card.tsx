@@ -9,7 +9,7 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <Link
       href={`/products/${product.id}`}
-      className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_30px_70px_-35px_rgba(15,23,42,0.4)]"
+      className="group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_30px_70px_-35px_rgba(15,23,42,0.4)]"
     >
       <div className="relative flex min-h-44 items-end overflow-hidden bg-[linear-gradient(135deg,#e2e8f0_0%,#f8fafc_45%,#dbeafe_100%)] p-6">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(148,163,184,0.22),transparent_42%)]" />
@@ -51,7 +51,7 @@ export function ProductCard({ product }: { product: Product }) {
             </p>
           </div>
 
-          <div className="rounded-2xl bg-slate-100 px-3 py-2 text-right">
+          <div className="rounded-lg bg-slate-100 px-3 py-2 text-right">
             <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
               <Boxes className="size-4" />
               {product.variants.length}

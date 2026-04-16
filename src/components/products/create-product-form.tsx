@@ -3,17 +3,15 @@
 import {
   useFieldArray,
   useForm,
-  useWatch,
   type Control,
   type FieldErrors,
   type UseFormRegister,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Layers3, Plus, Save, Shirt, Sparkles, Trash2 } from "lucide-react";
+import { Layers3, Plus, Save, Shirt, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { getApiErrorMessage, productsApi } from "@/lib/api";
-import { formatPrice } from "@/lib/products";
 import { createProductSchema, type CreateProductFormValues } from "@/lib/validations";
 
 const categoryOptions = ["Apparel", "Clothing", "Electronics", "Accessories", "Footwear"];
@@ -269,22 +267,10 @@ export function CreateProductForm() {
     },
   });
 
-  const productName = useWatch({ control, name: "name" });
-  const description = useWatch({ control, name: "description" });
-  const basePrice = useWatch({ control, name: "basePrice" });
-  const category = useWatch({ control, name: "category" });
-  const variantGroups = useWatch({ control, name: "variantGroups" }) ?? [defaultVariantGroup];
-
   const { fields, append, remove } = useFieldArray({
     control,
     name: "variantGroups",
   });
-
-  const totalVariants = variantGroups.reduce((sum, group) => sum + group.sizes.length, 0);
-  const totalStock = variantGroups.reduce(
-    (sum, group) => sum + group.sizes.reduce((stock, size) => stock + (size.stock || 0), 0),
-    0
-  );
 
   const onGenerateSku = (groupIndex: number, sizeIndex: number) => {
     const values = getValues();
@@ -335,11 +321,11 @@ export function CreateProductForm() {
     } catch (error) {
       const status =
         typeof error === "object" &&
-        error !== null &&
-        "response" in error &&
-        typeof error.response === "object" &&
-        error.response !== null &&
-        "status" in error.response
+          error !== null &&
+          "response" in error &&
+          typeof error.response === "object" &&
+          error.response !== null &&
+          "status" in error.response
           ? Number(error.response.status)
           : null;
 
@@ -357,9 +343,8 @@ export function CreateProductForm() {
   });
 
   return (
-    <form className="grid gap-8 xl:grid-cols-[1.2fr_0.8fr]" onSubmit={onSubmit}>
-      <div className="space-y-8">
-        <div className="grid gap-6 rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] sm:grid-cols-2 sm:p-8">
+    <form className="space-y-8" onSubmit={onSubmit}>
+      <div className="grid gap-6 rounded-xl border border-white/70 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] sm:grid-cols-2 sm:p-8">
           <div className="space-y-2 sm:col-span-2">
             <label className="text-sm font-medium text-slate-700" htmlFor="name">
               Product name
@@ -368,7 +353,7 @@ export function CreateProductForm() {
               id="name"
               type="text"
               placeholder="Classic T-Shirt"
-              className="w-full rounded-[1.25rem] border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
               {...register("name")}
             />
             {errors.name ? <p className="text-sm text-rose-600">{errors.name.message}</p> : null}
@@ -382,7 +367,7 @@ export function CreateProductForm() {
               id="description"
               rows={5}
               placeholder="A comfortable cotton t-shirt for everyday wear."
-              className="w-full rounded-[1.25rem] border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
               {...register("description")}
             />
             {errors.description ? (
@@ -400,7 +385,7 @@ export function CreateProductForm() {
               min="0"
               step="0.01"
               placeholder="29.99"
-              className="w-full rounded-[1.25rem] border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
               {...register("basePrice", { valueAsNumber: true })}
             />
             {errors.basePrice ? (
@@ -414,7 +399,7 @@ export function CreateProductForm() {
             </label>
             <select
               id="category"
-              className="w-full rounded-[1.25rem] border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
               {...register("category")}
             >
               <option value="">Select a category</option>
@@ -428,9 +413,9 @@ export function CreateProductForm() {
               <p className="text-sm text-rose-600">{errors.category.message}</p>
             ) : null}
           </div>
-        </div>
+      </div>
 
-        <div className="space-y-5 rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] sm:p-8">
+      <div className="space-y-5 rounded-xl border border-white/70 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-700">
@@ -455,7 +440,7 @@ export function CreateProductForm() {
           </div>
 
           {errors.variantGroups && !Array.isArray(errors.variantGroups) ? (
-            <div className="rounded-[1.5rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
               {errors.variantGroups.message}
             </div>
           ) : null}
@@ -485,44 +470,7 @@ export function CreateProductForm() {
               {isSubmitting ? "Creating product..." : "Create product"}
             </button>
           </div>
-        </div>
       </div>
-
-      <aside className="space-y-6">
-        <div className="overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(145deg,#062b2f_0%,#0f172a_58%,#164e63_100%)] p-6 text-white shadow-[0_32px_80px_-52px_rgba(8,15,35,0.65)]">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-100">
-            <Sparkles className="size-3.5" />
-            Live summary
-          </span>
-          <h3 className="mt-5 font-serif text-3xl tracking-tight">
-            {productName?.trim() || "Your next product"}
-          </h3>
-          <p className="mt-3 text-sm leading-7 text-slate-200">
-            {description?.trim() || "A short description will appear here as you type."}
-          </p>
-
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Category</p>
-              <p className="mt-2 text-lg font-semibold">{category || "Not selected"}</p>
-            </div>
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Base price</p>
-              <p className="mt-2 text-lg font-semibold">
-                {basePrice > 0 ? formatPrice(basePrice) : "Pending"}
-              </p>
-            </div>
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Variants</p>
-              <p className="mt-2 text-lg font-semibold">{totalVariants}</p>
-            </div>
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/10 p-4">
-              <p className="text-xs uppercase tracking-[0.22em] text-slate-300">Inventory</p>
-              <p className="mt-2 text-lg font-semibold">{totalStock} units</p>
-            </div>
-          </div>
-        </div>
-      </aside>
     </form>
   );
 }

@@ -167,7 +167,7 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
 
   return (
     <section className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10">
-      <div className="overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(135deg,rgba(15,23,42,0.98),rgba(26,36,66,0.96)_50%,rgba(8,145,178,0.78))] text-white shadow-[0_32px_80px_-44px_rgba(8,15,35,0.6)]">
+      <div className="overflow-hidden rounded-2xl border border-white/70 bg-[linear-gradient(135deg,rgba(15,23,42,0.98),rgba(26,36,66,0.96)_50%,rgba(8,145,178,0.78))] text-white shadow-[0_32px_80px_-44px_rgba(8,15,35,0.6)]">
         <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.2fr_0.8fr] lg:p-10">
           <div className="relative space-y-6">
             <div className="absolute -left-10 top-0 h-28 w-28 rounded-full bg-cyan-300/15 blur-3xl" />
@@ -204,17 +204,17 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-            <div className="rounded-[1.75rem] border border-white/10 bg-white/10 p-5 backdrop-blur">
+            <div className="rounded-lg border border-white/10 bg-white/10 p-5 backdrop-blur">
               <p className="text-xs uppercase tracking-[0.24em] text-slate-300">Products live</p>
               <p className="mt-3 text-3xl font-semibold">{products.length}</p>
               <p className="mt-2 text-sm text-slate-200">Total items currently synced from the API.</p>
             </div>
-            <div className="rounded-[1.75rem] border border-white/10 bg-white/10 p-5 backdrop-blur">
+            <div className="rounded-lg border border-white/10 bg-white/10 p-5 backdrop-blur">
               <p className="text-xs uppercase tracking-[0.24em] text-slate-300">Inventory units</p>
               <p className="mt-3 text-3xl font-semibold">{summary.totalInventory}</p>
               <p className="mt-2 text-sm text-slate-200">Combined stock across all visible variants.</p>
             </div>
-            <div className="rounded-[1.75rem] border border-white/10 bg-white/10 p-5 backdrop-blur">
+            <div className="rounded-lg border border-white/10 bg-white/10 p-5 backdrop-blur">
               <p className="text-xs uppercase tracking-[0.24em] text-slate-300">Low stock watch</p>
               <p className="mt-3 text-3xl font-semibold">{summary.lowStockProducts}</p>
               <p className="mt-2 text-sm text-slate-200">Products that may need replenishment soon.</p>
@@ -225,7 +225,7 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
 
       <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
         <div className="space-y-6">
-          <div className="rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] backdrop-blur">
+          <div className="rounded-xl border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] backdrop-blur">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700">
@@ -298,7 +298,7 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
                     router.replace(pathname, { scroll: false });
                   });
                 }}
-                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-950"
+                className="inline-flex items-center justify-center rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-950"
               >
                 Reset filters
               </button>
@@ -325,7 +325,7 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
               {products.length === 0 ? (
                 <EmptyProductsState />
               ) : (
-                <div className="rounded-[2rem] border border-dashed border-slate-300 bg-white/80 p-10 text-center shadow-[0_24px_60px_-48px_rgba(15,23,42,0.5)]">
+                <div className="rounded-xl border border-dashed border-slate-300 bg-white/80 p-10 text-center shadow-[0_24px_60px_-48px_rgba(15,23,42,0.5)]">
                   <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-cyan-100 text-cyan-800">
                     <PackageSearch className="size-7" />
                   </div>
@@ -361,12 +361,12 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
         </div>
 
         <aside className="space-y-4">
-          <div className="rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] backdrop-blur">
+          <div className="rounded-xl border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] backdrop-blur">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700">
               Operations snapshot
             </p>
             <div className="mt-5 space-y-4">
-              <div className="flex items-start gap-4 rounded-[1.5rem] bg-slate-50 p-4">
+              <div className="flex items-start gap-4 rounded-lg bg-slate-50 p-4">
                 <div className="flex size-11 items-center justify-center rounded-full bg-cyan-100 text-cyan-800">
                   <PackageCheck className="size-5" />
                 </div>
@@ -377,7 +377,7 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 rounded-[1.5rem] bg-slate-50 p-4">
+              <div className="flex items-start gap-4 rounded-lg bg-slate-50 p-4">
                 <div className="flex size-11 items-center justify-center rounded-full bg-amber-100 text-amber-800">
                   <Warehouse className="size-5" />
                 </div>
@@ -388,7 +388,7 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 rounded-[1.5rem] bg-slate-50 p-4">
+              <div className="flex items-start gap-4 rounded-lg bg-slate-50 p-4">
                 <div className="flex size-11 items-center justify-center rounded-full bg-emerald-100 text-emerald-800">
                   <ChartNoAxesCombined className="size-5" />
                 </div>
