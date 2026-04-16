@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserPlus } from "lucide-react";
-import toast from "react-hot-toast";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { useAuth } from "@/components/auth/auth-provider";
 import { authApi, getApiErrorMessage } from "@/lib/api";
+import { notifyError, notifySuccess } from "@/lib/notify";
 import { registerSchema, type RegisterFormValues } from "@/lib/validations";
 
 export function RegisterForm({ next = "/products" }: { next?: string }) {
@@ -31,10 +31,10 @@ export function RegisterForm({ next = "/products" }: { next?: string }) {
     try {
       const response = await authApi.register(values);
       await login({ token: response.accessToken, user: response.user });
-      toast.success("Account created successfully.");
+      notifySuccess("Account created", "Your account is ready to use.");
       router.replace(next);
     } catch (error) {
-      toast.error(getApiErrorMessage(error, "Unable to create your account."));
+      notifyError("Unable to create account", getApiErrorMessage(error, "Please try again."));
     }
   });
 

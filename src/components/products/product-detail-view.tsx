@@ -6,14 +6,13 @@ import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, CircleAlert, PackageX, Pencil, ShieldCheck, Trash2 } from "lucide-react";
-import toast from "react-hot-toast";
 import { useAuth } from "@/components/auth/auth-provider";
 import { ProductImage } from "@/components/products/product-image";
 import { QuickBuyButton } from "@/components/products/quick-buy-button";
 import { VariantManager } from "@/components/products/variant-manager";
 import { VariantSelector } from "@/components/products/variant-selector";
 import { getApiErrorMessage, productsApi } from "@/lib/api";
-import { notifyDelete, notifySuccess } from "@/lib/notify";
+import { notifyDelete, notifyError, notifySuccess } from "@/lib/notify";
 import {
   formatAttributeLabel,
   formatPrice,
@@ -141,7 +140,7 @@ export function ProductDetailView({ product }: { product: Product }) {
       setIsEditing(false);
       notifySuccess("Product updated", "The product details were saved successfully.");
     } catch (error) {
-      toast.error(getApiErrorMessage(error, "Unable to update the product."));
+      notifyError("Unable to update product", getApiErrorMessage(error, "Please try again."));
     }
   });
 
@@ -165,7 +164,7 @@ export function ProductDetailView({ product }: { product: Product }) {
       router.push("/products");
       router.refresh();
     } catch (error) {
-      toast.error(getApiErrorMessage(error, "Unable to delete the product."));
+      notifyError("Unable to delete product", getApiErrorMessage(error, "Please try again."));
       setIsDeleting(false);
     }
   };

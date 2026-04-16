@@ -11,8 +11,8 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Layers3, Plus, Save, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 import { getApiErrorMessage, productsApi } from "@/lib/api";
+import { notifyError, notifySuccess } from "@/lib/notify";
 import { createProductSchema, type CreateProductFormValues } from "@/lib/validations";
 
 const categoryOptions = ["Apparel", "Clothing", "Electronics", "Accessories", "Footwear"];
@@ -333,7 +333,7 @@ export function CreateProductForm() {
     setValue(`variantGroups.${groupIndex}.sizes.${sizeIndex}.sku`, generated, {
       shouldDirty: true,
     });
-    toast.success("SKU generated.");
+    notifySuccess("SKU generated", "The SKU field was filled automatically.");
   };
 
   const onSubmit = handleSubmit(async (values) => {
@@ -359,7 +359,7 @@ export function CreateProductForm() {
       };
 
       const product = await productsApi.create(payload);
-      toast.success("Product created successfully.");
+      notifySuccess("Product created", "The new product is now available in the catalog.");
       router.push(`/products/${product.id}`);
     } catch (error) {
       const status =
@@ -377,11 +377,11 @@ export function CreateProductForm() {
           type: "server",
           message: "A duplicate variant combination was rejected by the API.",
         });
-        toast.error("Duplicate variant combination. Adjust the conflicting size rows.");
+        notifyError("Duplicate variant combination", "Adjust the conflicting size rows and try again.");
         return;
       }
 
-      toast.error(getApiErrorMessage(error, "Unable to create the product."));
+      notifyError("Unable to create product", getApiErrorMessage(error, "Please try again."));
     }
   });
 

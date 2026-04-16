@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LogIn } from "lucide-react";
-import toast from "react-hot-toast";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { useAuth } from "@/components/auth/auth-provider";
 import { authApi, getApiErrorMessage } from "@/lib/api";
+import { notifyError, notifySuccess } from "@/lib/notify";
 import { loginSchema, type LoginFormValues } from "@/lib/validations";
 
 export function LoginForm({
@@ -37,10 +37,10 @@ export function LoginForm({
     try {
       const response = await authApi.login(values);
       await login({ token: response.accessToken, user: response.user });
-      toast.success("Welcome back.");
+      notifySuccess("Welcome back", "You have signed in successfully.");
       router.replace(next);
     } catch (error) {
-      toast.error(getApiErrorMessage(error, "Unable to sign in. Please try again."));
+      notifyError("Unable to sign in", getApiErrorMessage(error, "Please try again."));
     }
   });
 

@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { LoaderCircle, ShoppingCart } from "lucide-react";
-import toast from "react-hot-toast";
 import { useAuth } from "@/components/auth/auth-provider";
 import { productsApi, getApiErrorMessage } from "@/lib/api";
+import { notifyError, notifySuccess } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 
 type QuickBuyButtonProps = {
@@ -41,9 +41,9 @@ export function QuickBuyButton({
       setIsSubmitting(true);
       const response = await productsApi.quickBuy(productId, { variantId, quantity: 1 });
       onPurchased(response.variant.stock);
-      toast.success(response.message);
+      notifySuccess("Purchase completed", response.message);
     } catch (error) {
-      toast.error(getApiErrorMessage(error, "Quick buy failed. Please try again."));
+      notifyError("Quick buy failed", getApiErrorMessage(error, "Please try again."));
     } finally {
       setIsSubmitting(false);
     }

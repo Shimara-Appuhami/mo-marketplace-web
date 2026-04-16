@@ -1,11 +1,19 @@
 "use client";
 
-import { CheckCircle2, Trash2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 
-type NotifyTone = "success" | "delete";
+type NotifyTone = "success" | "delete" | "error";
 
 function toastClasses(tone: NotifyTone) {
+  if (tone === "error") {
+    return {
+      shell: "pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-2xl border border-amber-200 bg-white p-4 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.4)]",
+      iconWrap: "flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600",
+      eyebrow: "text-[10px] font-bold uppercase tracking-[0.24em] text-amber-500",
+    };
+  }
+
   if (tone === "delete") {
     return {
       shell: "pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-2xl border border-rose-200 bg-white p-4 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.4)]",
@@ -31,8 +39,10 @@ function ToastCard({
   description?: string;
 }) {
   const styles = toastClasses(tone);
-  const Icon = tone === "delete" ? Trash2 : CheckCircle2;
-  const eyebrow = tone === "delete" ? "Removed" : "Saved";
+  const Icon =
+    tone === "delete" ? Trash2 : tone === "error" ? AlertCircle : CheckCircle2;
+  const eyebrow =
+    tone === "delete" ? "Removed" : tone === "error" ? "Attention" : "Saved";
 
   return (
     <div className={styles.shell}>
@@ -60,6 +70,13 @@ export function notifySuccess(title: string, description?: string) {
 export function notifyDelete(title: string, description?: string) {
   toast.custom(<ToastCard tone="delete" title={title} description={description} />, {
     duration: 3600,
+    position: "top-right",
+  });
+}
+
+export function notifyError(title: string, description?: string) {
+  toast.custom(<ToastCard tone="error" title={title} description={description} />, {
+    duration: 4200,
     position: "top-right",
   });
 }

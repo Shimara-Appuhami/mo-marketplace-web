@@ -4,9 +4,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pencil, Plus, Save, Trash2, X } from "lucide-react";
-import toast from "react-hot-toast";
 import { getApiErrorMessage, productsApi } from "@/lib/api";
-import { notifyDelete, notifySuccess } from "@/lib/notify";
+import { notifyDelete, notifyError, notifySuccess } from "@/lib/notify";
 import {
   createVariantFormSchema,
   type CreateVariantFormValues,
@@ -190,7 +189,7 @@ function AddVariantForm({
       notifySuccess("Variant added", "The new variant is now available in inventory.");
       onAdded(added);
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Failed to add variant."));
+      notifyError("Failed to add variant", getApiErrorMessage(err, "Please try again."));
     }
   });
 
@@ -253,7 +252,7 @@ function EditVariantForm({
       notifySuccess("Variant updated", "Your changes were saved successfully.");
       onSaved(updated);
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Failed to update variant."));
+      notifyError("Failed to update variant", getApiErrorMessage(err, "Please try again."));
     }
   });
 
@@ -327,7 +326,7 @@ export function VariantManager({
       onVariantsChange(variants.filter((v) => v.id !== variant.id));
       notifyDelete("Variant deleted", label ? `${label} was removed from this product.` : "The variant was removed from this product.");
     } catch (err) {
-      toast.error(getApiErrorMessage(err, "Failed to delete variant."));
+      notifyError("Failed to delete variant", getApiErrorMessage(err, "Please try again."));
     } finally {
       setDeletingId(null);
     }

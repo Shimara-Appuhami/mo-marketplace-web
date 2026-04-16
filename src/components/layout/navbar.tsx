@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import toast from "react-hot-toast";
 import { useAuth } from "@/components/auth/auth-provider";
+import { notifySuccess } from "@/lib/notify";
 
 export function Navbar() {
   const { isAuthenticated, logout, user } = useAuth();
@@ -12,7 +12,7 @@ export function Navbar() {
 
   const handleLogout = () => {
     logout();
-    toast.success("You have been logged out.");
+    notifySuccess("Logged out", "Your session has been cleared.");
     router.push("/login");
   };
 

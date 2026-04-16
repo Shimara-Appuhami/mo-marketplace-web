@@ -10,12 +10,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <Toaster
         position="top-right"
         toastOptions={{
-          style: {
-            borderRadius: "16px",
-            background: "#111827",
-            color: "#f9fafb",
-          },
+          duration: 3600,
         }}
+        gutter={12}
+        containerStyle={{ top: 24, right: 24 }}
       />
     </AuthProvider>
   );
