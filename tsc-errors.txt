@@ -1,0 +1,5 @@
+﻿src/app/layout.tsx(2,10): error TS2305: Module '"next/font/google"' has no exported member 'Geist'.
+src/app/layout.tsx(2,17): error TS2305: Module '"next/font/google"' has no exported member 'Geist_Mono'.
+src/components/auth/auth-provider.tsx(82,11): error TS2604: JSX element type 'AuthContext' does not have any construct or call signatures.
+src/components/auth/auth-provider.tsx(82,11): error TS2786: 'AuthContext' cannot be used as a JSX component.
+  Its type 'Context<AuthContextValue | null>' is not a valid JSX element type.

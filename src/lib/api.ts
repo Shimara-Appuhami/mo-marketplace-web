@@ -63,6 +63,21 @@ export const authApi = {
   },
 };
 
+type CreateVariantPayload = {
+  attributes: { color: string; size: string; material: string };
+  price: number;
+  stock: number;
+  sku?: string;
+};
+
+type CreateProductPayload = {
+  name: string;
+  description?: string;
+  basePrice: number;
+  category: string;
+  variants: CreateVariantPayload[];
+};
+
 export const productsApi = {
   list: async () => {
     const { data } = await api.get<Product[]>("/products");
@@ -70,6 +85,10 @@ export const productsApi = {
   },
   getById: async (id: string) => {
     const { data } = await api.get<Product>(`/products/${id}`);
+    return data;
+  },
+  create: async (payload: CreateProductPayload) => {
+    const { data } = await api.post<Product>("/products", payload);
     return data;
   },
   quickBuy: async (productId: string, payload: { variantId: string; quantity: number }) => {
