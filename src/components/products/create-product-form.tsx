@@ -8,7 +8,7 @@ import {
   type UseFormRegister,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Layers3, Plus, Save, Shirt, Trash2 } from "lucide-react";
+import { Layers3, Plus, Save, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { getApiErrorMessage, productsApi } from "@/lib/api";
@@ -19,27 +19,60 @@ const colorOptions = ["Black", "White", "Blue", "Red", "Green", "Gray", "Brown"]
 const sizeOptions = ["XS", "S", "M", "L", "XL", "XXL"];
 const materialOptions = ["Cotton", "Polyester", "Leather", "Wool", "Denim", "Linen"];
 
-const defaultSizeRow = {
-  size: "",
-  price: 0,
-  stock: 0,
-  sku: "",
-};
-
-const defaultVariantGroup = {
-  color: "",
-  material: "",
-  sizes: [defaultSizeRow],
-};
+const defaultSizeRow = { size: "", price: 0, stock: 0, sku: "" };
+const defaultVariantGroup = { color: "", material: "", sizes: [defaultSizeRow] };
 
 function buildSkuSeed(parts: string[]) {
   return parts
-    .map((part) => part.trim().toUpperCase().replace(/[^A-Z0-9]+/g, "-"))
+    .map((p) => p.trim().toUpperCase().replace(/[^A-Z0-9]+/g, "-"))
     .filter(Boolean)
     .join("-")
     .slice(0, 32);
 }
 
+// ── Shared input/select className ──────────────────────────────────────────────
+const inputCls =
+  "w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100";
+
+// ── Field label ────────────────────────────────────────────────────────────────
+function Label({ htmlFor, children }: { htmlFor?: string; children: React.ReactNode }) {
+  return (
+    <label htmlFor={htmlFor} className="block text-xs font-semibold uppercase tracking-wider text-slate-500">
+      {children}
+    </label>
+  );
+}
+
+// ── Error message ──────────────────────────────────────────────────────────────
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return <p className="mt-1 text-xs text-rose-600">{message}</p>;
+}
+
+// ── Section card ───────────────────────────────────────────────────────────────
+function SectionCard({
+  label,
+  title,
+  children,
+}: {
+  label: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white">
+      <div className="border-b border-slate-100 px-6 py-4">
+        <span className="inline-block rounded bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.22em] text-amber-700">
+          {label}
+        </span>
+        <h2 className="mt-1 text-lg font-bold tracking-tight text-slate-950">{title}</h2>
+      </div>
+      <div className="p-6">{children}</div>
+    </div>
+  );
+}
+
+// ── Variant group ──────────────────────────────────────────────────────────────
 type VariantGroupFieldsProps = {
   control: Control<CreateProductFormValues>;
   errors: FieldErrors<CreateProductFormValues>;
@@ -65,187 +98,159 @@ function VariantGroupFields({
   });
 
   return (
-    <div className="space-y-5 rounded-[2rem] border border-slate-200 bg-slate-50/80 p-5">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-900">
-            <Layers3 className="size-4 text-slate-500" />
-            Color block {groupIndex + 1}
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Set the shared color and material once, then add as many sizes as you need.
-          </p>
+    <div className="rounded-lg border border-slate-200 bg-slate-50">
+      {/* Group header */}
+      <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <Layers3 className="size-4 text-slate-400" />
+          <span className="text-sm font-semibold text-slate-900">
+            Variant block {groupIndex + 1}
+          </span>
+          <span className="text-xs text-slate-400">— shared color &amp; material</span>
         </div>
         <button
           type="button"
           onClick={() => onRemoveGroup(groupIndex)}
           disabled={groupCount === 1}
-          className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-3 py-2 text-sm font-medium text-slate-600 hover:border-rose-400 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-500 transition hover:border-rose-300 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <Trash2 className="size-4" />
-          Remove block
+          <Trash2 className="size-3" />
+          Remove
         </button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">Color</label>
-          <select
-            className="w-full rounded-[1.25rem] border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
-            {...register(`variantGroups.${groupIndex}.color`)}
-          >
-            <option value="">Select color</option>
-            {colorOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          {errors.variantGroups?.[groupIndex]?.color ? (
-            <p className="text-sm text-rose-600">
-              {errors.variantGroups[groupIndex]?.color?.message}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">Material</label>
-          <select
-            className="w-full rounded-[1.25rem] border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
-            {...register(`variantGroups.${groupIndex}.material`)}
-          >
-            <option value="">Select material</option>
-            {materialOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          {errors.variantGroups?.[groupIndex]?.material ? (
-            <p className="text-sm text-rose-600">
-              {errors.variantGroups[groupIndex]?.material?.message}
-            </p>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="space-y-4 rounded-[1.5rem] border border-slate-200 bg-white p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-slate-900">Sizes in this block</p>
-            <p className="text-xs text-slate-500">
-              Example: one black cotton shirt with sizes S, M, and L.
-            </p>
+      <div className="space-y-4 p-4">
+        {/* Color + Material */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label>Color</Label>
+            <select className={inputCls} {...register(`variantGroups.${groupIndex}.color`)}>
+              <option value="">Select color</option>
+              {colorOptions.map((o) => (
+                <option key={o} value={o}>{o}</option>
+              ))}
+            </select>
+            <FieldError message={errors.variantGroups?.[groupIndex]?.color?.message} />
           </div>
-          <button
-            type="button"
-            onClick={() => append(defaultSizeRow)}
-            className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:border-slate-950 hover:text-slate-950"
-          >
-            <Plus className="size-4" />
-            Add size
-          </button>
+          <div className="space-y-1.5">
+            <Label>Material</Label>
+            <select className={inputCls} {...register(`variantGroups.${groupIndex}.material`)}>
+              <option value="">Select material</option>
+              {materialOptions.map((o) => (
+                <option key={o} value={o}>{o}</option>
+              ))}
+            </select>
+            <FieldError message={errors.variantGroups?.[groupIndex]?.material?.message} />
+          </div>
         </div>
 
-        <div className="space-y-4">
-          {fields.map((field, sizeIndex) => (
-            <div
-              key={field.id}
-              className="grid gap-4 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 md:grid-cols-[0.95fr_1fr_0.8fr_1fr_auto]"
+        {/* Sizes table */}
+        <div className="rounded-lg border border-slate-200 bg-white">
+          <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3">
+            <span className="text-xs font-semibold text-slate-700">
+              Sizes ({fields.length})
+            </span>
+            <button
+              type="button"
+              onClick={() => append(defaultSizeRow)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-blue-400 hover:text-blue-600"
             >
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Size</label>
-                <select
-                  className="w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
-                  {...register(`variantGroups.${groupIndex}.sizes.${sizeIndex}.size`)}
-                >
-                  <option value="">Select size</option>
-                  {sizeOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                {errors.variantGroups?.[groupIndex]?.sizes?.[sizeIndex]?.size ? (
-                  <p className="text-sm text-rose-600">
-                    {errors.variantGroups[groupIndex]?.sizes?.[sizeIndex]?.size?.message}
-                  </p>
-                ) : null}
-              </div>
+              <Plus className="size-3" />
+              Add size
+            </button>
+          </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Price</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="34.99"
-                  className="w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
-                  {...register(`variantGroups.${groupIndex}.sizes.${sizeIndex}.price`, {
-                    valueAsNumber: true,
-                  })}
-                />
-                {errors.variantGroups?.[groupIndex]?.sizes?.[sizeIndex]?.price ? (
-                  <p className="text-sm text-rose-600">
-                    {errors.variantGroups[groupIndex]?.sizes?.[sizeIndex]?.price?.message}
-                  </p>
-                ) : null}
-              </div>
+          <div className="divide-y divide-slate-100">
+            {fields.map((field, sizeIndex) => (
+              <div
+                key={field.id}
+                className="grid items-start gap-3 px-4 py-3 md:grid-cols-[1fr_1fr_0.7fr_1fr_auto]"
+              >
+                {/* Size */}
+                <div className="space-y-1">
+                  <Label>Size</Label>
+                  <select
+                    className={inputCls}
+                    {...register(`variantGroups.${groupIndex}.sizes.${sizeIndex}.size`)}
+                  >
+                    <option value="">Select</option>
+                    {sizeOptions.map((o) => (
+                      <option key={o} value={o}>{o}</option>
+                    ))}
+                  </select>
+                  <FieldError
+                    message={errors.variantGroups?.[groupIndex]?.sizes?.[sizeIndex]?.size?.message}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Stock</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  placeholder="10"
-                  className="w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
-                  {...register(`variantGroups.${groupIndex}.sizes.${sizeIndex}.stock`, {
-                    valueAsNumber: true,
-                  })}
-                />
-                {errors.variantGroups?.[groupIndex]?.sizes?.[sizeIndex]?.stock ? (
-                  <p className="text-sm text-rose-600">
-                    {errors.variantGroups[groupIndex]?.sizes?.[sizeIndex]?.stock?.message}
-                  </p>
-                ) : null}
-              </div>
+                {/* Price */}
+                <div className="space-y-1">
+                  <Label>Price ($)</Label>
+                  <input
+                    type="number" min="0" step="0.01" placeholder="34.99"
+                    className={inputCls}
+                    {...register(`variantGroups.${groupIndex}.sizes.${sizeIndex}.price`, {
+                      valueAsNumber: true,
+                    })}
+                  />
+                  <FieldError
+                    message={errors.variantGroups?.[groupIndex]?.sizes?.[sizeIndex]?.price?.message}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">SKU (optional)</label>
-                <input
-                  type="text"
-                  placeholder="TSHIRT-BLK-M-COT"
-                  className="w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
-                  {...register(`variantGroups.${groupIndex}.sizes.${sizeIndex}.sku`)}
-                />
-                <button
-                  type="button"
-                  onClick={() => onGenerateSku(groupIndex, sizeIndex)}
-                  className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-700 hover:text-teal-800"
-                >
-                  Generate SKU
-                </button>
-              </div>
+                {/* Stock */}
+                <div className="space-y-1">
+                  <Label>Stock</Label>
+                  <input
+                    type="number" min="0" step="1" placeholder="10"
+                    className={inputCls}
+                    {...register(`variantGroups.${groupIndex}.sizes.${sizeIndex}.stock`, {
+                      valueAsNumber: true,
+                    })}
+                  />
+                  <FieldError
+                    message={errors.variantGroups?.[groupIndex]?.sizes?.[sizeIndex]?.stock?.message}
+                  />
+                </div>
 
-              <div className="flex items-end">
-                <button
-                  type="button"
-                  onClick={() => remove(sizeIndex)}
-                  disabled={fields.length === 1}
-                  className="inline-flex items-center gap-2 rounded-full border border-slate-300 px-3 py-3 text-sm font-medium text-slate-600 hover:border-rose-400 hover:text-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <Trash2 className="size-4" />
-                </button>
+                {/* SKU */}
+                <div className="space-y-1">
+                  <Label>SKU (optional)</Label>
+                  <input
+                    type="text" placeholder="SHIRT-BLK-M"
+                    className={inputCls}
+                    {...register(`variantGroups.${groupIndex}.sizes.${sizeIndex}.sku`)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onGenerateSku(groupIndex, sizeIndex)}
+                    className="text-[10px] font-bold uppercase tracking-widest text-blue-600 hover:text-blue-700"
+                  >
+                    Auto-generate
+                  </button>
+                </div>
+
+                {/* Delete row */}
+                <div className="flex items-center pt-6">
+                  <button
+                    type="button"
+                    onClick={() => remove(sizeIndex)}
+                    disabled={fields.length === 1}
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 p-2 text-slate-400 transition hover:border-rose-300 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
+// ── Main form ──────────────────────────────────────────────────────────────────
 export function CreateProductForm() {
   const router = useRouter();
   const {
@@ -276,18 +281,13 @@ export function CreateProductForm() {
     const values = getValues();
     const group = values.variantGroups[groupIndex];
     const sizeRow = group?.sizes[sizeIndex];
-
-    if (!group || !sizeRow) {
-      return;
-    }
-
+    if (!group || !sizeRow) return;
     const generated = buildSkuSeed([
       values.name || "PRODUCT",
       group.color || "COLOR",
       sizeRow.size || "SIZE",
       group.material || "MATERIAL",
     ]);
-
     setValue(`variantGroups.${groupIndex}.sizes.${sizeIndex}.sku`, generated, {
       shouldDirty: true,
     });
@@ -321,11 +321,11 @@ export function CreateProductForm() {
     } catch (error) {
       const status =
         typeof error === "object" &&
-          error !== null &&
-          "response" in error &&
-          typeof error.response === "object" &&
-          error.response !== null &&
-          "status" in error.response
+        error !== null &&
+        "response" in error &&
+        typeof error.response === "object" &&
+        error.response !== null &&
+        "status" in error.response
           ? Number(error.response.status)
           : null;
 
@@ -343,109 +343,82 @@ export function CreateProductForm() {
   });
 
   return (
-    <form className="space-y-8" onSubmit={onSubmit}>
-      <div className="grid gap-6 rounded-xl border border-white/70 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] sm:grid-cols-2 sm:p-8">
-          <div className="space-y-2 sm:col-span-2">
-            <label className="text-sm font-medium text-slate-700" htmlFor="name">
-              Product name
-            </label>
+    <form className="space-y-6" onSubmit={onSubmit}>
+      {/* ── Product details ── */}
+      <SectionCard label="Step 1" title="Product Details">
+        <div className="grid gap-5 sm:grid-cols-2">
+          {/* Name */}
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label htmlFor="name">Product name</Label>
             <input
-              id="name"
-              type="text"
-              placeholder="Classic T-Shirt"
-              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+              id="name" type="text" placeholder="Classic T-Shirt"
+              className={inputCls}
               {...register("name")}
             />
-            {errors.name ? <p className="text-sm text-rose-600">{errors.name.message}</p> : null}
+            <FieldError message={errors.name?.message} />
           </div>
 
-          <div className="space-y-2 sm:col-span-2">
-            <label className="text-sm font-medium text-slate-700" htmlFor="description">
-              Description
-            </label>
+          {/* Description */}
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label htmlFor="description">Description</Label>
             <textarea
-              id="description"
-              rows={5}
+              id="description" rows={4}
               placeholder="A comfortable cotton t-shirt for everyday wear."
-              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+              className={inputCls}
               {...register("description")}
             />
-            {errors.description ? (
-              <p className="text-sm text-rose-600">{errors.description.message}</p>
-            ) : null}
+            <FieldError message={errors.description?.message} />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700" htmlFor="basePrice">
-              Base price
-            </label>
+          {/* Base price */}
+          <div className="space-y-1.5">
+            <Label htmlFor="basePrice">Base price ($)</Label>
             <input
-              id="basePrice"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="29.99"
-              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+              id="basePrice" type="number" min="0" step="0.01" placeholder="29.99"
+              className={inputCls}
               {...register("basePrice", { valueAsNumber: true })}
             />
-            {errors.basePrice ? (
-              <p className="text-sm text-rose-600">{errors.basePrice.message}</p>
-            ) : null}
+            <FieldError message={errors.basePrice?.message} />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700" htmlFor="category">
-              Category
-            </label>
-            <select
-              id="category"
-              className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
-              {...register("category")}
-            >
+          {/* Category */}
+          <div className="space-y-1.5">
+            <Label htmlFor="category">Category</Label>
+            <select id="category" className={inputCls} {...register("category")}>
               <option value="">Select a category</option>
-              {categoryOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
+              {categoryOptions.map((o) => (
+                <option key={o} value={o}>{o}</option>
               ))}
             </select>
-            {errors.category ? (
-              <p className="text-sm text-rose-600">{errors.category.message}</p>
-            ) : null}
+            <FieldError message={errors.category?.message} />
           </div>
-      </div>
+        </div>
+      </SectionCard>
 
-      <div className="space-y-5 rounded-xl border border-white/70 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] sm:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-teal-700">
-                Variant builder
-              </p>
-              <h2 className="mt-2 inline-flex items-center gap-2 text-2xl font-semibold tracking-tight text-slate-950">
-                <Shirt className="size-6 text-slate-500" />
-                Build real product options
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-                Create one block per color and material, then add multiple sizes beneath it.
-              </p>
-            </div>
+      {/* ── Variant builder ── */}
+      <SectionCard label="Step 2" title="Variants">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-slate-500">
+              One block = one colour + material. Add a size row per size inside it.
+            </p>
             <button
               type="button"
               onClick={() => append(defaultVariantGroup)}
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-950 hover:text-slate-950"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-blue-400 hover:text-blue-600"
             >
-              <Plus className="size-4" />
-              Add color block
+              <Plus className="size-3.5" />
+              Add block
             </button>
           </div>
 
-          {errors.variantGroups && !Array.isArray(errors.variantGroups) ? (
+          {errors.variantGroups && !Array.isArray(errors.variantGroups) && (
             <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
               {errors.variantGroups.message}
             </div>
-          ) : null}
+          )}
 
-          <div className="space-y-5">
+          <div className="space-y-4">
             {fields.map((field, groupIndex) => (
               <VariantGroupFields
                 key={field.id}
@@ -459,17 +432,22 @@ export function CreateProductForm() {
               />
             ))}
           </div>
+        </div>
+      </SectionCard>
 
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
-            >
-              <Save className="size-4" />
-              {isSubmitting ? "Creating product..." : "Create product"}
-            </button>
-          </div>
+      {/* ── Submit bar ── */}
+      <div className="flex items-center justify-between gap-4 border-t border-slate-200 pt-4">
+        <p className="text-xs text-slate-400">
+          Duplicate colour + size + material combos are blocked before submission.
+        </p>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Save className="size-4" />
+          {isSubmitting ? "Creating…" : "Create product"}
+        </button>
       </div>
     </form>
   );
