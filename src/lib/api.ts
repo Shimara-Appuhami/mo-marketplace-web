@@ -36,7 +36,6 @@ api.interceptors.response.use(
     }
   );
 
-// ── Auth ─────────────────────────────────────────────────────────────────────
 export const authApi = {
   login: async (payload: LoginInput) => {
     const { data } = await api.post<AuthResponse>("/auth/login", payload);
@@ -52,7 +51,6 @@ export const authApi = {
   },
 };
 
-// ── Payload types ─────────────────────────────────────────────────────────────
 export type VariantAttributes = {
   color: string;
   size: string;
@@ -74,7 +72,6 @@ export type CreateProductPayload = {
   variants: VariantPayload[];
 };
 
-/** PUT /products/:id — replaces top-level fields only (no variants) */
 export type UpdateProductPayload = {
   name?: string;
   description?: string;
@@ -82,43 +79,34 @@ export type UpdateProductPayload = {
   category?: string;
 };
 
-/** PUT /products/:id/variants/:variantId */
 export type UpdateVariantPayload = Partial<VariantPayload>;
 
-// ── Products API ──────────────────────────────────────────────────────────────
 export const productsApi = {
-  /** GET /products */
   list: async () => {
     const { data } = await api.get<Product[]>("/products");
     return data;
   },
 
-  /** GET /products/:id */
   getById: async (id: string) => {
     const { data } = await api.get<Product>(`/products/${id}`);
     return data;
   },
 
-  /** POST /products 🔒 */
   create: async (payload: CreateProductPayload) => {
     const { data } = await api.post<Product>("/products", payload);
     return data;
   },
 
-  /** PUT /products/:id 🔒 */
   update: async (id: string, payload: UpdateProductPayload) => {
     const { data } = await api.put<Product>(`/products/${id}`, payload);
     return data;
   },
 
-  /** DELETE /products/:id 🔒 */
   delete: async (id: string) => {
     await api.delete(`/products/${id}`);
   },
 
-  // ── Variant sub-resources ─────────────────────────────────────────────────
 
-  /** POST /products/:id/variants 🔒 */
   addVariant: async (productId: string, payload: VariantPayload) => {
     const { data } = await api.post<ProductVariant>(
       `/products/${productId}/variants`,
@@ -127,7 +115,6 @@ export const productsApi = {
     return data;
   },
 
-  /** PUT /products/:id/variants/:variantId 🔒 */
   updateVariant: async (
     productId: string,
     variantId: string,
@@ -140,12 +127,10 @@ export const productsApi = {
     return data;
   },
 
-  /** DELETE /products/:id/variants/:variantId 🔒 */
   deleteVariant: async (productId: string, variantId: string) => {
     await api.delete(`/products/${productId}/variants/${variantId}`);
   },
 
-  /** POST /products/:id/quick-buy */
   quickBuy: async (productId: string, payload: { variantId: string; quantity: number }) => {
     const { data } = await api.post<QuickBuyResponse>(
       `/products/${productId}/quick-buy`,
@@ -155,7 +140,6 @@ export const productsApi = {
   },
 };
 
-// ── Error helper ──────────────────────────────────────────────────────────────
 export function getApiErrorMessage(error: unknown, fallback: string) {
   if (!axios.isAxiosError<ApiErrorResponse>(error)) return fallback;
   const message = error.response?.data?.message;

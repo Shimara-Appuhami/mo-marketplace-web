@@ -49,7 +49,6 @@ export const createProductSchema = z
     variantGroups: z.array(variantGroupSchema).min(1, "Add at least one variant block."),
   })
   .superRefine((data, ctx) => {
-    // Client-side duplicate colour + size + material guard
     const seen = new Set<string>();
 
     data.variantGroups.forEach((group, gi) => {
