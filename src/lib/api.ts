@@ -4,6 +4,7 @@ import type {
   ApiErrorResponse,
   AuthResponse,
   LoginInput,
+  Product,
   RegisterInput,
   User,
 } from "@/types";
@@ -57,6 +58,13 @@ export const authApi = {
   },
   me: async () => {
     const { data } = await api.get<User>("/auth/me");
+    return data;
+  },
+};
+
+export const productsApi = {
+  list: async () => {
+    const { data } = await api.get<Product[]>("/products");
     return data;
   },
 };
