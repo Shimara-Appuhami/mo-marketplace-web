@@ -40,28 +40,30 @@ export default async function ProductsPage() {
 
   return (
     <section className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6">
-      <div className="flex flex-col gap-5 rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,#ffffff_0%,#f8fafc_48%,#dbeafe_100%)] p-8 shadow-[0_28px_70px_-45px_rgba(15,23,42,0.38)]">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-4">
-            <span className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">
-              Products
-            </span>
-            <div className="space-y-3">
-              <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-slate-950">
-                Browse the marketplace catalog.
-              </h1>
-              <p className="max-w-2xl text-sm leading-6 text-slate-600">
-                Explore public products, compare variant pricing, and open any item to view
-                the available combinations in detail.
-              </p>
-            </div>
-          </div>
+  
+  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between border-b border-slate-200 pb-4">
+    
+    <div className="space-y-1">
+      <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        Products
+      </span>
 
-          <div className="inline-flex items-center gap-3 self-start rounded-full bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
-            <span>{products.length} products</span>
-          </div>
-        </div>
-      </div>
+      <h1 className="text-2xl font-semibold text-slate-900">
+        Browse the marketplace catalog
+      </h1>
+
+      <p className="max-w-lg text-sm text-slate-600">
+        Explore public products, compare pricing, and view details.
+      </p>
+    </div>
+
+    <div className="flex items-center gap-2 border border-slate-200 px-3 py-1.5 text-sm text-slate-700">
+      <span className="h-2 w-2 bg-green-500"></span>
+      <span>{products.length} products</span>
+    </div>
+
+  </div>
+
 
       {products.length === 0 ? (
         <EmptyProductsState />
