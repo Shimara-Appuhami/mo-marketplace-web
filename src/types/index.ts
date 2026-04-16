@@ -45,3 +45,11 @@ export interface Product {
   updatedAt: string;
   variants: ProductVariant[];
 }
+
+export interface QuickBuyResponse {
+  success: boolean;
+  message: string;
+  variant: ProductVariant & {
+    product: Product;
+  };
+}

@@ -5,6 +5,7 @@ import type {
   AuthResponse,
   LoginInput,
   Product,
+  QuickBuyResponse,
   RegisterInput,
   User,
 } from "@/types";
@@ -65,6 +66,17 @@ export const authApi = {
 export const productsApi = {
   list: async () => {
     const { data } = await api.get<Product[]>("/products");
+    return data;
+  },
+  getById: async (id: string) => {
+    const { data } = await api.get<Product>(`/products/${id}`);
+    return data;
+  },
+  quickBuy: async (productId: string, payload: { variantId: string; quantity: number }) => {
+    const { data } = await api.post<QuickBuyResponse>(
+      `/products/${productId}/quick-buy`,
+      payload
+    );
     return data;
   },
 };
