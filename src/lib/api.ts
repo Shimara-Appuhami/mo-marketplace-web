@@ -99,7 +99,6 @@ export type UpdateProductPayload = {
   category?: string;
 };
 
-/** PUT /products/:id/variants/:variantId — backend only allows price, stock, and sku updates */
 export type UpdateVariantPayload = {
   price?: number;
   stock?: number;

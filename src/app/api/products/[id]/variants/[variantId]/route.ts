@@ -8,11 +8,9 @@ import {
 
 type RouteContext = { params: Promise<{ id: string; variantId: string }> };
 
-/**
  * PUT /api/products/[id]/variants/[variantId]  🔒
  * Update a specific variant (partial update supported).
  * Requires: Authorization: Bearer <token>
- */
 export async function PUT(
   request: NextRequest,
   { params }: RouteContext
@@ -30,11 +28,9 @@ export async function PUT(
   );
 }
 
-/**
  * DELETE /api/products/[id]/variants/[variantId]  🔒
  * Remove a specific variant from a product.
  * Requires: Authorization: Bearer <token>
- */
 export async function DELETE(
   request: NextRequest,
   { params }: RouteContext

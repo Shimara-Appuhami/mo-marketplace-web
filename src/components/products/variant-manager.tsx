@@ -15,7 +15,6 @@ import {
 import { formatPrice, parsePrice } from "@/lib/products";
 import type { ProductVariant } from "@/types";
 
-// ── Shared styles ─────────────────────────────────────────────────────────────
 const inputCls =
   "w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100";
 const labelCls =
@@ -30,7 +29,6 @@ function FieldError({ message }: { message?: string }) {
   return <p className="mt-1 text-xs text-rose-600">{message}</p>;
 }
 
-// ── Shared variant field set ───────────────────────────────────────────────────
 function VariantFields({
   register,
   errors,
@@ -159,7 +157,6 @@ function EditVariantFields({
   );
 }
 
-// ── POST /products/:id/variants ────────────────────────────────────────────────
 function AddVariantForm({
   productId,
   onAdded,
@@ -217,7 +214,6 @@ function AddVariantForm({
   );
 }
 
-// ── PUT /products/:id/variants/:variantId ──────────────────────────────────────
 function EditVariantForm({
   productId,
   variant,
@@ -280,7 +276,6 @@ function EditVariantForm({
   );
 }
 
-// ── Main export — controlled by parent's variants state ────────────────────────
 export function VariantManager({
   productId,
   variants,
@@ -296,19 +291,16 @@ export function VariantManager({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // POST — add
   const handleAdded = (variant: ProductVariant) => {
     onVariantsChange([...variants, variant]);
     setShowAddForm(false);
   };
 
-  // PUT — update
   const handleSaved = (updated: ProductVariant) => {
     onVariantsChange(variants.map((v) => (v.id === updated.id ? updated : v)));
     setEditingId(null);
   };
 
-  // DELETE — remove
   const handleDelete = async (variant: ProductVariant) => {
     const label = [
       variant.attributes.color,
@@ -334,7 +326,6 @@ export function VariantManager({
 
   return (
     <div className="mt-8 rounded-xl border border-slate-200 bg-white">
-      {/* Header */}
       <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-6 py-4">
         <div>
           <span className="inline-block rounded bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.22em] text-amber-700">
@@ -357,7 +348,6 @@ export function VariantManager({
         )}
       </div>
 
-      {/* Empty state */}
       {variants.length === 0 && !showAddForm ? (
         <div className="px-6 py-10 text-center text-sm text-slate-400">
           No variants yet.{" "}
@@ -461,7 +451,6 @@ export function VariantManager({
         </div>
       )}
 
-      {/* POST form — shown below table */}
       {showAddForm && (
         <AddVariantForm
           productId={productId}

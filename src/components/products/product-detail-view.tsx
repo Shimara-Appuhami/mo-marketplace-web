@@ -315,7 +315,6 @@ export function ProductDetailView({ product }: { product: Product }) {
                       />
                       {imageValue ? (
                         <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={imageValue}
                             alt="Product preview"

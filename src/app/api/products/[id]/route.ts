@@ -8,10 +8,8 @@ import {
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-/**
  * GET /api/products/[id]
  * Public — fetch a single product by ID.
- */
 export async function GET(
   _request: NextRequest,
   { params }: RouteContext
@@ -20,11 +18,9 @@ export async function GET(
   return proxyRequest(getUpstreamUrl(`/products/${encodePathSegment(id)}`));
 }
 
-/**
  * PUT /api/products/[id]  🔒
  * Update top-level product fields (name, description, basePrice, category).
  * Requires: Authorization: Bearer <token>
- */
 export async function PUT(
   request: NextRequest,
   { params }: RouteContext
@@ -37,11 +33,9 @@ export async function PUT(
   });
 }
 
-/**
  * DELETE /api/products/[id]  🔒
  * Delete a product and all its variants.
  * Requires: Authorization: Bearer <token>
- */
 export async function DELETE(
   request: NextRequest,
   { params }: RouteContext

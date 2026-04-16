@@ -60,7 +60,6 @@ export function LoginForm({
 
       <form className="space-y-5" onSubmit={onSubmit}>
         
-        {/* Email */}
         <div className="space-y-1">
           <label className="text-sm font-medium text-slate-700" htmlFor="email">
             Email
@@ -77,7 +76,6 @@ export function LoginForm({
           )}
         </div>
 
-        {/* Password */}
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-slate-700" htmlFor="password">
@@ -100,7 +98,6 @@ export function LoginForm({
           )}
         </div>
 
-        {/* Button */}
         <button
           type="submit"
           disabled={isSubmitting}

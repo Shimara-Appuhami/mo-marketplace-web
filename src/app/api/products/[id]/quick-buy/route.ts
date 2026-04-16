@@ -8,7 +8,6 @@ import {
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-/**
  * POST /api/products/[id]/quick-buy
  * Decrement stock by 1 for the selected variant.
  * Body: { variantId: string; quantity: number }
@@ -16,7 +15,6 @@ type RouteContext = { params: Promise<{ id: string }> };
  * Authentication is optional here — the upstream backend enforces its own
  * auth policy. If the user is logged in the browser will send the
  * Authorization header and it is forwarded; if not, the upstream decides.
- */
 export async function POST(
   request: NextRequest,
   { params }: RouteContext

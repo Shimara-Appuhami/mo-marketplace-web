@@ -48,7 +48,6 @@ export function RegisterForm({ next = "/products" }: { next?: string }) {
     >
       <form className="space-y-5" onSubmit={onSubmit}>
         
-        {/* Name */}
         <div className="space-y-1">
           <label className="text-sm font-medium text-slate-700" htmlFor="name">
             Full name
@@ -63,7 +62,6 @@ export function RegisterForm({ next = "/products" }: { next?: string }) {
           {errors.name && <p className="text-xs text-rose-600">{errors.name.message}</p>}
         </div>
 
-        {/* Email */}
         <div className="space-y-1">
           <label className="text-sm font-medium text-slate-700" htmlFor="email">
             Email
@@ -78,7 +76,6 @@ export function RegisterForm({ next = "/products" }: { next?: string }) {
           {errors.email && <p className="text-xs text-rose-600">{errors.email.message}</p>}
         </div>
 
-        {/* Password */}
         <div className="space-y-1">
           <label className="text-sm font-medium text-slate-700" htmlFor="password">
             Password
@@ -95,7 +92,6 @@ export function RegisterForm({ next = "/products" }: { next?: string }) {
           )}
         </div>
 
-        {/* Button */}
         <button
           type="submit"
           disabled={isSubmitting}

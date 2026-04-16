@@ -1,9 +1,7 @@
 export function ProductCardSkeleton() {
   return (
     <div className="flex flex-col">
-      {/* Square image skeleton */}
       <div className="aspect-square w-full animate-pulse bg-slate-200" />
-      {/* Footer skeleton */}
       <div className="space-y-2 pt-3">
         <div className="flex items-start justify-between gap-2">
           <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200" />

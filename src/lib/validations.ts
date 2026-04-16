@@ -33,7 +33,6 @@ export const registerSchema = z.object({
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 
-// ─── Create product ────────────────────────────────────────────────────────────
 
 const sizeRowSchema = z.object({
   size: z.string().min(1, "Select a size."),
@@ -82,7 +81,6 @@ export const createProductSchema = z
 
 export type CreateProductFormValues = z.infer<typeof createProductSchema>;
 
-// ─── Add / Edit variant modal ─────────────────────────────────────────────────
 
 export const createVariantFormSchema = z.object({
   color: z.string().min(1, "Select a colour."),

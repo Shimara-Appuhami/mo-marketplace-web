@@ -119,7 +119,6 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6">
-      {/* ── Page header ─────────────────────────────────────── */}
       <div className="mb-8 space-y-3">
         <span className="inline-block rounded bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-amber-700">
           Curated Collection
@@ -133,10 +132,8 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
         </p>
       </div>
 
-      {/* ── Category tabs + filter toggle ───────────────────── */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div className="flex flex-wrap items-center gap-1">
-          {/* All Items tab */}
           <button
             type="button"
             onClick={() => updateParams({ category: "all" })}
@@ -150,7 +147,6 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
             All Items
           </button>
 
-          {/* Dynamic category tabs */}
           {categories.map((cat) => (
             <button
               key={cat}
@@ -201,10 +197,8 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
         </div>
       </div>
 
-      {/* ── Expanded filter panel ────────────────────────────── */}
       {filtersOpen && (
         <div className="mb-6 grid gap-4 rounded-xl border border-slate-200 bg-white p-5 sm:grid-cols-[1fr_auto_auto_auto]">
-          {/* Search */}
           <form onSubmit={handleSearchSubmit} className="relative">
             <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
             <input
@@ -216,7 +210,6 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
             />
           </form>
 
-          {/* Availability */}
           <select
             value={availability}
             onChange={(e) => updateParams({ availability: e.target.value })}
@@ -228,7 +221,6 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
             <option value="out-of-stock">Out of stock</option>
           </select>
 
-          {/* Sort */}
           <select
             value={sort}
             onChange={(e) => updateParams({ sort: e.target.value })}
@@ -241,7 +233,6 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
             ))}
           </select>
 
-          {/* Apply search */}
           <button
             type="button"
             onClick={() => updateParams({ q: search.trim() })}
@@ -252,7 +243,6 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
         </div>
       )}
 
-      {/* ── Result meta bar ──────────────────────────────────── */}
       <div className="mb-5 flex items-center justify-between gap-4">
         <p className="text-sm text-slate-500">
           <span className="font-semibold text-slate-900">{filteredProducts.length}</span> of{" "}
@@ -269,7 +259,6 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
         </div>
       </div>
 
-      {/* ── Product grid ─────────────────────────────────────── */}
       {filteredProducts.length === 0 ? (
         products.length === 0 ? (
           <EmptyProductsState />

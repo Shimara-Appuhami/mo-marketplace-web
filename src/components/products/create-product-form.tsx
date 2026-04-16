@@ -31,11 +31,9 @@ function buildSkuSeed(parts: string[]) {
     .slice(0, 32);
 }
 
-// ── Shared input/select className ──────────────────────────────────────────────
 const inputCls =
   "w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100";
 
-// ── Field label ────────────────────────────────────────────────────────────────
 function Label({ htmlFor, children }: { htmlFor?: string; children: React.ReactNode }) {
   return (
     <label htmlFor={htmlFor} className="block text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -44,13 +42,11 @@ function Label({ htmlFor, children }: { htmlFor?: string; children: React.ReactN
   );
 }
 
-// ── Error message ──────────────────────────────────────────────────────────────
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return <p className="mt-1 text-xs text-rose-600">{message}</p>;
 }
 
-// ── Section card ───────────────────────────────────────────────────────────────
 function SectionCard({
   label,
   title,
@@ -73,7 +69,6 @@ function SectionCard({
   );
 }
 
-// ── Variant group ──────────────────────────────────────────────────────────────
 type VariantGroupFieldsProps = {
   control: Control<CreateProductFormValues>;
   errors: FieldErrors<CreateProductFormValues>;
@@ -100,7 +95,6 @@ function VariantGroupFields({
 
   return (
     <div className="rounded-lg border border-slate-200 bg-slate-50">
-      {/* Group header */}
       <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
         <div className="flex items-center gap-2">
           <Layers3 className="size-4 text-slate-400" />
@@ -121,7 +115,6 @@ function VariantGroupFields({
       </div>
 
       <div className="space-y-4 p-4">
-        {/* Color + Material */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label>Color</Label>
@@ -145,7 +138,6 @@ function VariantGroupFields({
           </div>
         </div>
 
-        {/* Sizes table */}
         <div className="rounded-lg border border-slate-200 bg-white">
           <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3">
             <span className="text-xs font-semibold text-slate-700">
@@ -167,7 +159,6 @@ function VariantGroupFields({
                 key={field.id}
                 className="grid items-start gap-3 px-4 py-3 md:grid-cols-[1fr_1fr_0.7fr_1fr_auto]"
               >
-                {/* Size */}
                 <div className="space-y-1">
                   <Label>Size</Label>
                   <select
@@ -184,7 +175,6 @@ function VariantGroupFields({
                   />
                 </div>
 
-                {/* Price */}
                 <div className="space-y-1">
                   <Label>Price ($)</Label>
                   <input
@@ -199,7 +189,6 @@ function VariantGroupFields({
                   />
                 </div>
 
-                {/* Stock */}
                 <div className="space-y-1">
                   <Label>Stock</Label>
                   <input
@@ -214,7 +203,6 @@ function VariantGroupFields({
                   />
                 </div>
 
-                {/* SKU */}
                 <div className="space-y-1">
                   <Label>SKU (optional)</Label>
                   <input
@@ -231,7 +219,6 @@ function VariantGroupFields({
                   </button>
                 </div>
 
-                {/* Delete row */}
                 <div className="flex items-center pt-6">
                   <button
                     type="button"
@@ -251,7 +238,6 @@ function VariantGroupFields({
   );
 }
 
-// ── Main form ──────────────────────────────────────────────────────────────────
 export function CreateProductForm() {
   const router = useRouter();
   const imageInputId = useId();
@@ -387,10 +373,8 @@ export function CreateProductForm() {
 
   return (
     <form className="space-y-6" onSubmit={onSubmit}>
-      {/* ── Product details ── */}
       <SectionCard label="Step 1" title="Product Details">
         <div className="grid gap-5 sm:grid-cols-2">
-          {/* Name */}
           <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="name">Product name</Label>
             <input
@@ -401,7 +385,6 @@ export function CreateProductForm() {
             <FieldError message={errors.name?.message} />
           </div>
 
-          {/* Description */}
           <div className="space-y-1.5 sm:col-span-2">
             <Label htmlFor="description">Description</Label>
             <textarea
@@ -436,7 +419,6 @@ export function CreateProductForm() {
             />
             {imageValue ? (
               <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={imageValue}
                   alt="Product preview"
@@ -447,7 +429,6 @@ export function CreateProductForm() {
             <FieldError message={errors.imageUrl?.message} />
           </div>
 
-          {/* Base price */}
           <div className="space-y-1.5">
             <Label htmlFor="basePrice">Base price ($)</Label>
             <input
@@ -458,7 +439,6 @@ export function CreateProductForm() {
             <FieldError message={errors.basePrice?.message} />
           </div>
 
-          {/* Category */}
           <div className="space-y-1.5">
             <Label htmlFor="category">Category</Label>
             <select id="category" className={inputCls} {...register("category")}>
@@ -472,7 +452,6 @@ export function CreateProductForm() {
         </div>
       </SectionCard>
 
-      {/* ── Variant builder ── */}
       <SectionCard label="Step 2" title="Variants">
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
@@ -512,7 +491,6 @@ export function CreateProductForm() {
         </div>
       </SectionCard>
 
-      {/* ── Submit bar ── */}
       <div className="flex items-center justify-between gap-4 border-t border-slate-200 pt-4">
         <p className="text-xs text-slate-400">
           Duplicate colour + size + material combos are blocked before submission.

@@ -8,12 +8,10 @@ import {
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-/**
  * POST /api/products/[id]/variants  🔒
  * Add a new variant to an existing product.
  * Body: { attributes: { color, size, material }, price, stock, sku? }
  * Requires: Authorization: Bearer <token>
- */
 export async function POST(
   request: NextRequest,
   { params }: RouteContext
