@@ -1,5 +1,6 @@
 "use client";
 
+import { useId, useRef } from "react";
 import {
   useFieldArray,
   useForm,
@@ -253,6 +254,8 @@ function VariantGroupFields({
 // ── Main form ──────────────────────────────────────────────────────────────────
 export function CreateProductForm() {
   const router = useRouter();
+  const imageInputId = useId();
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
   const {
     control,
     register,
@@ -260,12 +263,15 @@ export function CreateProductForm() {
     setError,
     setValue,
     getValues,
+    clearErrors,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<CreateProductFormValues>({
     resolver: zodResolver(createProductSchema),
     defaultValues: {
       name: "",
       description: "",
+      imageUrl: "",
       basePrice: 0,
       category: "",
       variantGroups: [defaultVariantGroup],
@@ -276,6 +282,42 @@ export function CreateProductForm() {
     control,
     name: "variantGroups",
   });
+  const imageValue = watch("imageUrl");
+
+  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("imageUrl", {
+        type: "validate",
+        message: "Choose an image file.",
+      });
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setValue("imageUrl", String(reader.result ?? ""), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      clearErrors("imageUrl");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setValue("imageUrl", "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    clearErrors("imageUrl");
+    if (imageInputRef.current) {
+      imageInputRef.current.value = "";
+    }
+  };
 
   const onGenerateSku = (groupIndex: number, sizeIndex: number) => {
     const values = getValues();
@@ -299,6 +341,7 @@ export function CreateProductForm() {
       const payload = {
         name: values.name,
         description: values.description,
+        imageUrl: values.imageUrl?.trim() || undefined,
         basePrice: values.basePrice,
         category: values.category,
         variants: values.variantGroups.flatMap((group) =>
@@ -368,6 +411,40 @@ export function CreateProductForm() {
               {...register("description")}
             />
             <FieldError message={errors.description?.message} />
+          </div>
+
+          <div className="space-y-3 sm:col-span-2">
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor={imageInputId}>Product image</Label>
+              {imageValue ? (
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="text-xs font-semibold text-rose-600 transition hover:text-rose-700"
+                >
+                  Remove image
+                </button>
+              ) : null}
+            </div>
+            <input
+              id={imageInputId}
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              className={inputCls}
+              onChange={handleImageFileChange}
+            />
+            {imageValue ? (
+              <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imageValue}
+                  alt="Product preview"
+                  className="h-48 w-full object-cover"
+                />
+              </div>
+            ) : null}
+            <FieldError message={errors.imageUrl?.message} />
           </div>
 
           {/* Base price */}

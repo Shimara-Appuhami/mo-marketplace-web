@@ -1,5 +1,16 @@
 import { z } from "zod";
 
+const imageValueSchema = z
+  .string()
+  .trim()
+  .refine(
+    (value) =>
+      value.length === 0 ||
+      z.url().safeParse(value).success ||
+      value.startsWith("data:image/"),
+    "Enter a valid image URL or choose an image file."
+  );
+
 export const loginSchema = z.object({
   email: z.email("Enter a valid email address."),
   password: z.string().min(6, "Password must be at least 6 characters."),
@@ -44,6 +55,7 @@ export const createProductSchema = z
   .object({
     name: z.string().trim().min(1, "Product name is required.").max(120, "Name too long."),
     description: z.string().max(2000, "Description too long.").optional(),
+    imageUrl: imageValueSchema.optional(),
     basePrice: z.number("Enter a valid base price.").min(0, "Base price must be 0 or more."),
     category: z.string().min(1, "Select a category."),
     variantGroups: z.array(variantGroupSchema).min(1, "Add at least one variant block."),
@@ -100,6 +112,7 @@ export type UpdateVariantFormValues = z.infer<typeof updateVariantFormSchema>;
 export const updateProductSchema = z.object({
   name: z.string().trim().min(1, "Product name is required.").max(120, "Name too long."),
   description: z.string().max(2000, "Description too long.").optional(),
+  imageUrl: imageValueSchema.optional(),
   basePrice: z.number("Enter a valid base price.").min(0, "Base price must be 0 or more."),
   category: z.string().min(1, "Select a category."),
 });

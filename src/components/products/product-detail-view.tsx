@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
@@ -29,6 +29,8 @@ function getInitialAttributes(product: Product) {
 
 export function ProductDetailView({ product }: { product: Product }) {
   const router = useRouter();
+  const imageInputId = useId();
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
   const { isAuthenticated } = useAuth();
   const [productState, setProductState] = useState(product);
   const [variants, setVariants] = useState(product.variants);
@@ -41,12 +43,16 @@ export function ProductDetailView({ product }: { product: Product }) {
     register,
     handleSubmit,
     reset,
+    setValue,
+    clearErrors,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<UpdateProductFormValues>({
     resolver: zodResolver(updateProductSchema),
     defaultValues: {
       name: product.name,
       description: product.description ?? "",
+      imageUrl: product.imageUrl ?? "",
       basePrice: parsePrice(product.basePrice),
       category: product.category,
     },
@@ -60,6 +66,37 @@ export function ProductDetailView({ product }: { product: Product }) {
     ) ?? variants[0] ?? null;
 
   const outOfStock = isProductOutOfStock({ ...productState, variants });
+  const imageValue = watch("imageUrl");
+
+  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setValue("imageUrl", String(reader.result ?? ""), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      clearErrors("imageUrl");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = () => {
+    setValue("imageUrl", "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    clearErrors("imageUrl");
+    if (imageInputRef.current) {
+      imageInputRef.current.value = "";
+    }
+  };
 
   const handleSelectAttribute = (attributeKey: string, value: string) => {
     setSelectedAttributes((current) => ({ ...current, [attributeKey]: value }));
@@ -81,6 +118,7 @@ export function ProductDetailView({ product }: { product: Product }) {
     reset({
       name: productState.name,
       description: productState.description ?? "",
+      imageUrl: productState.imageUrl ?? "",
       basePrice: parsePrice(productState.basePrice),
       category: productState.category,
     });
@@ -92,6 +130,7 @@ export function ProductDetailView({ product }: { product: Product }) {
       const updatedProduct = await productsApi.update(productState.id, {
         name: values.name,
         description: values.description?.trim() || undefined,
+        imageUrl: values.imageUrl?.trim() || undefined,
         basePrice: values.basePrice,
         category: values.category,
       });
@@ -248,6 +287,44 @@ export function ProductDetailView({ product }: { product: Product }) {
                       />
                       {errors.description ? (
                         <p className="text-xs text-rose-600">{errors.description.message}</p>
+                      ) : null}
+                    </div>
+
+                    <div className="space-y-3 sm:col-span-2">
+                      <div className="flex items-center justify-between gap-3">
+                        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500">
+                          Product image
+                        </label>
+                        {imageValue ? (
+                          <button
+                            type="button"
+                            onClick={handleRemoveImage}
+                            className="text-xs font-semibold text-rose-600 transition hover:text-rose-700"
+                          >
+                            Remove image
+                          </button>
+                        ) : null}
+                      </div>
+                      <input
+                        id={imageInputId}
+                        ref={imageInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                        onChange={handleImageFileChange}
+                      />
+                      {imageValue ? (
+                        <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={imageValue}
+                            alt="Product preview"
+                            className="h-48 w-full object-cover"
+                          />
+                        </div>
+                      ) : null}
+                      {errors.imageUrl ? (
+                        <p className="text-xs text-rose-600">{errors.imageUrl.message}</p>
                       ) : null}
                     </div>
 
