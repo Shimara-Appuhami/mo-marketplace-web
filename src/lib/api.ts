@@ -16,13 +16,19 @@ export const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-api.interceptors.request.use((config) => {
+const browserApi = axios.create({
+  baseURL: "/api",
+  headers: { "Content-Type": "application/json" },
+});
+
+function attachInterceptors(client: typeof api) {
+  client.interceptors.request.use((config) => {
     const token = useAuthStore.getState().token;
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   });
 
-api.interceptors.response.use(
+  client.interceptors.response.use(
     (response) => response,
     (error) => {
       if (error.response?.status === 401) {
@@ -35,18 +41,30 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
   );
+}
+
+attachInterceptors(api);
+attachInterceptors(browserApi);
+
+function getProductClient() {
+  return typeof window === "undefined" ? api : browserApi;
+}
+
+function getAuthClient() {
+  return typeof window === "undefined" ? api : browserApi;
+}
 
 export const authApi = {
   login: async (payload: LoginInput) => {
-    const { data } = await api.post<AuthResponse>("/auth/login", payload);
+    const { data } = await getAuthClient().post<AuthResponse>("/auth/login", payload);
     return data;
   },
   register: async (payload: RegisterInput) => {
-    const { data } = await api.post<AuthResponse>("/auth/register", payload);
+    const { data } = await getAuthClient().post<AuthResponse>("/auth/register", payload);
     return data;
   },
   me: async () => {
-    const { data } = await api.get<User>("/auth/me");
+    const { data } = await getAuthClient().get<User>("/auth/me");
     return data;
   },
 };
@@ -67,6 +85,7 @@ export type VariantPayload = {
 export type CreateProductPayload = {
   name: string;
   description?: string;
+  imageUrl?: string;
   basePrice: number;
   category: string;
   variants: VariantPayload[];
@@ -75,40 +94,46 @@ export type CreateProductPayload = {
 export type UpdateProductPayload = {
   name?: string;
   description?: string;
+  imageUrl?: string;
   basePrice?: number;
   category?: string;
 };
 
-export type UpdateVariantPayload = Partial<VariantPayload>;
+/** PUT /products/:id/variants/:variantId — backend only allows price, stock, and sku updates */
+export type UpdateVariantPayload = {
+  price?: number;
+  stock?: number;
+  sku?: string;
+};
 
 export const productsApi = {
   list: async () => {
-    const { data } = await api.get<Product[]>("/products");
+    const { data } = await getProductClient().get<Product[]>("/products");
     return data;
   },
 
   getById: async (id: string) => {
-    const { data } = await api.get<Product>(`/products/${id}`);
+    const { data } = await getProductClient().get<Product>(`/products/${id}`);
     return data;
   },
 
   create: async (payload: CreateProductPayload) => {
-    const { data } = await api.post<Product>("/products", payload);
+    const { data } = await getProductClient().post<Product>("/products", payload);
     return data;
   },
 
   update: async (id: string, payload: UpdateProductPayload) => {
-    const { data } = await api.put<Product>(`/products/${id}`, payload);
+    const { data } = await getProductClient().put<Product>(`/products/${id}`, payload);
     return data;
   },
 
   delete: async (id: string) => {
-    await api.delete(`/products/${id}`);
+    await getProductClient().delete(`/products/${id}`);
   },
 
 
   addVariant: async (productId: string, payload: VariantPayload) => {
-    const { data } = await api.post<ProductVariant>(
+    const { data } = await getProductClient().post<ProductVariant>(
       `/products/${productId}/variants`,
       payload
     );
@@ -120,7 +145,7 @@ export const productsApi = {
     variantId: string,
     payload: UpdateVariantPayload
   ) => {
-    const { data } = await api.put<ProductVariant>(
+    const { data } = await getProductClient().put<ProductVariant>(
       `/products/${productId}/variants/${variantId}`,
       payload
     );
@@ -128,11 +153,11 @@ export const productsApi = {
   },
 
   deleteVariant: async (productId: string, variantId: string) => {
-    await api.delete(`/products/${productId}/variants/${variantId}`);
+    await getProductClient().delete(`/products/${productId}/variants/${variantId}`);
   },
 
   quickBuy: async (productId: string, payload: { variantId: string; quantity: number }) => {
-    const { data } = await api.post<QuickBuyResponse>(
+    const { data } = await getProductClient().post<QuickBuyResponse>(
       `/products/${productId}/quick-buy`,
       payload
     );

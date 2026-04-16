@@ -6,7 +6,7 @@ import {
   proxyRequest,
 } from "@/lib/proxy";
 
-type RouteContext = { params: { id: string } };
+type RouteContext = { params: Promise<{ id: string }> };
 
 /**
  * POST /api/products/[id]/variants  🔒
@@ -18,9 +18,9 @@ export async function POST(
   request: NextRequest,
   { params }: RouteContext
 ) {
-  const body = await request.text();
+  const [{ id }, body] = await Promise.all([params, request.text()]);
   return proxyRequest(
-    getUpstreamUrl(`/products/${encodePathSegment(params.id)}/variants`),
+    getUpstreamUrl(`/products/${encodePathSegment(id)}/variants`),
     {
       method: "POST",
       authHeader: extractAuthHeader(request),

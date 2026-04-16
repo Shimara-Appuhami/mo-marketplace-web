@@ -70,3 +70,39 @@ export const createProductSchema = z
 
 export type CreateProductFormValues = z.infer<typeof createProductSchema>;
 
+// ─── Add / Edit variant modal ─────────────────────────────────────────────────
+
+export const createVariantFormSchema = z.object({
+  color: z.string().min(1, "Select a colour."),
+  size: z.string().min(1, "Select a size."),
+  material: z.string().min(1, "Select a material."),
+  price: z.number("Enter a valid price.").min(0, "Price must be 0 or more."),
+  stock: z
+    .number("Enter a valid stock count.")
+    .check(z.int("Stock must be a whole number."))
+    .min(0, "Stock must be 0 or more."),
+  sku: z.string().optional(),
+});
+
+export type CreateVariantFormValues = z.infer<typeof createVariantFormSchema>;
+
+export const updateVariantFormSchema = z.object({
+  price: z.number("Enter a valid price.").min(0, "Price must be 0 or more."),
+  stock: z
+    .number("Enter a valid stock count.")
+    .check(z.int("Stock must be a whole number."))
+    .min(0, "Stock must be 0 or more."),
+  sku: z.string().optional(),
+});
+
+export type UpdateVariantFormValues = z.infer<typeof updateVariantFormSchema>;
+
+export const updateProductSchema = z.object({
+  name: z.string().trim().min(1, "Product name is required.").max(120, "Name too long."),
+  description: z.string().max(2000, "Description too long.").optional(),
+  basePrice: z.number("Enter a valid base price.").min(0, "Base price must be 0 or more."),
+  category: z.string().min(1, "Select a category."),
+});
+
+export type UpdateProductFormValues = z.infer<typeof updateProductSchema>;
+

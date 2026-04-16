@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ProductImage } from "@/components/products/product-image";
 import { getProductPriceRange, isProductOutOfStock } from "@/lib/products";
 import type { Product } from "@/types";
 
@@ -28,19 +29,14 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link href={`/products/${product.id}`} className="group flex flex-col">
-      {/* ── Image area ─────────────────────────────────── */}
       <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${gradient}`}>
-        {/* Subtle inner highlight */}
+        <ProductImage
+          product={product}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          fallbackClassName="absolute inset-0 flex items-center justify-center opacity-10 transition-opacity duration-300 group-hover:opacity-5 text-[120px] font-black uppercase leading-none tracking-tighter text-white"
+        />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.06),transparent_55%)]" />
 
-        {/* Category initial overlay – decorative */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-10 transition-opacity duration-300 group-hover:opacity-5">
-          <span className="text-[120px] font-black uppercase leading-none tracking-tighter text-white">
-            {(product.category || product.name).charAt(0)}
-          </span>
-        </div>
-
-        {/* NEW ARRIVAL badge (top-left) */}
         {isNew && !outOfStock && (
           <span className="absolute left-3 top-3 z-10 rounded bg-white px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-800 shadow-sm">
             New Arrival

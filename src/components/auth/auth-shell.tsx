@@ -20,16 +20,16 @@ export function AuthShell({
   alternateLabel: string;
   children: React.ReactNode;
 }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isReady } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isReady || !isAuthenticated) {
       return;
     }
 
     router.replace(redirectTo);
-  }, [isAuthenticated, redirectTo, router]);
+  }, [isAuthenticated, isReady, redirectTo, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,#dbeafe_0%,#f8fafc_45%,#e2e8f0_100%)] px-4 py-12">

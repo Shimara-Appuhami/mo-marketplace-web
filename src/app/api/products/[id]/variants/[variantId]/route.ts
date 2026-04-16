@@ -6,7 +6,7 @@ import {
   proxyRequest,
 } from "@/lib/proxy";
 
-type RouteContext = { params: { id: string; variantId: string } };
+type RouteContext = { params: Promise<{ id: string; variantId: string }> };
 
 /**
  * PUT /api/products/[id]/variants/[variantId]  🔒
@@ -17,10 +17,10 @@ export async function PUT(
   request: NextRequest,
   { params }: RouteContext
 ) {
-  const body = await request.text();
+  const [{ id, variantId }, body] = await Promise.all([params, request.text()]);
   return proxyRequest(
     getUpstreamUrl(
-      `/products/${encodePathSegment(params.id)}/variants/${encodePathSegment(params.variantId)}`
+      `/products/${encodePathSegment(id)}/variants/${encodePathSegment(variantId)}`
     ),
     {
       method: "PUT",
@@ -39,9 +39,10 @@ export async function DELETE(
   request: NextRequest,
   { params }: RouteContext
 ) {
+  const { id, variantId } = await params;
   return proxyRequest(
     getUpstreamUrl(
-      `/products/${encodePathSegment(params.id)}/variants/${encodePathSegment(params.variantId)}`
+      `/products/${encodePathSegment(id)}/variants/${encodePathSegment(variantId)}`
     ),
     {
       method: "DELETE",

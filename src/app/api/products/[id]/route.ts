@@ -6,7 +6,7 @@ import {
   proxyRequest,
 } from "@/lib/proxy";
 
-type RouteContext = { params: { id: string } };
+type RouteContext = { params: Promise<{ id: string }> };
 
 /**
  * GET /api/products/[id]
@@ -16,7 +16,8 @@ export async function GET(
   _request: NextRequest,
   { params }: RouteContext
 ) {
-  return proxyRequest(getUpstreamUrl(`/products/${encodePathSegment(params.id)}`));
+  const { id } = await params;
+  return proxyRequest(getUpstreamUrl(`/products/${encodePathSegment(id)}`));
 }
 
 /**
@@ -28,8 +29,8 @@ export async function PUT(
   request: NextRequest,
   { params }: RouteContext
 ) {
-  const body = await request.text();
-  return proxyRequest(getUpstreamUrl(`/products/${encodePathSegment(params.id)}`), {
+  const [{ id }, body] = await Promise.all([params, request.text()]);
+  return proxyRequest(getUpstreamUrl(`/products/${encodePathSegment(id)}`), {
     method: "PUT",
     authHeader: extractAuthHeader(request),
     body,
@@ -45,7 +46,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: RouteContext
 ) {
-  return proxyRequest(getUpstreamUrl(`/products/${encodePathSegment(params.id)}`), {
+  const { id } = await params;
+  return proxyRequest(getUpstreamUrl(`/products/${encodePathSegment(id)}`), {
     method: "DELETE",
     authHeader: extractAuthHeader(request),
   });

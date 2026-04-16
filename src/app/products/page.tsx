@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AlertTriangle, ChevronRight } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { EmptyProductsState } from "@/components/products/empty-products-state";
 import { ProductCard } from "@/components/products/product-card";
 import { productsApi } from "@/lib/api";
@@ -32,12 +32,6 @@ export default async function ProductsPage() {
             >
               Retry
             </Link>
-            <Link
-              href="/products/create"
-              className="inline-flex items-center rounded-full border border-rose-300 px-4 py-2 text-sm font-semibold text-rose-900 transition hover:border-rose-400"
-            >
-              Create product
-            </Link>
           </div>
         </div>
       </section>
@@ -65,10 +59,6 @@ export default async function ProductsPage() {
 
           <div className="inline-flex items-center gap-3 self-start rounded-full bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
             <span>{products.length} products</span>
-            <ChevronRight className="size-4 text-slate-400" />
-            <Link href="/products/create" className="text-slate-950 transition hover:text-slate-700">
-              Create new
-            </Link>
           </div>
         </div>
       </div>

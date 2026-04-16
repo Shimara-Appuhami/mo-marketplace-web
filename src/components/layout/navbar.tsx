@@ -27,9 +27,11 @@ export function Navbar() {
             <Link href="/products" className="transition hover:text-slate-950">
               Products
             </Link>
-            <Link href="/products/create" className="transition hover:text-slate-950">
-              Create Product
-            </Link>
+            {isAuthenticated ? (
+              <Link href="/products/create" className="transition hover:text-slate-950">
+                Create Product
+              </Link>
+            ) : null}
           </nav>
         </div>
 
