@@ -13,6 +13,7 @@ import { QuickBuyButton } from "@/components/products/quick-buy-button";
 import { VariantManager } from "@/components/products/variant-manager";
 import { VariantSelector } from "@/components/products/variant-selector";
 import { getApiErrorMessage, productsApi } from "@/lib/api";
+import { notifyDelete, notifySuccess } from "@/lib/notify";
 import {
   formatAttributeLabel,
   formatPrice,
@@ -138,7 +139,7 @@ export function ProductDetailView({ product }: { product: Product }) {
       setProductState(updatedProduct);
       setVariants(updatedProduct.variants);
       setIsEditing(false);
-      toast.success("Product updated successfully.");
+      notifySuccess("Product updated", "The product details were saved successfully.");
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Unable to update the product."));
     }
@@ -160,7 +161,7 @@ export function ProductDetailView({ product }: { product: Product }) {
     try {
       setIsDeleting(true);
       await productsApi.delete(productState.id);
-      toast.success("Product deleted successfully.");
+      notifyDelete("Product deleted", `${productState.name} was removed successfully.`);
       router.push("/products");
       router.refresh();
     } catch (error) {

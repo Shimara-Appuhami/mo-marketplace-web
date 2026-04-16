@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Pencil, Plus, Save, Trash2, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { getApiErrorMessage, productsApi } from "@/lib/api";
+import { notifyDelete, notifySuccess } from "@/lib/notify";
 import {
   createVariantFormSchema,
   type CreateVariantFormValues,
@@ -186,7 +187,7 @@ function AddVariantForm({
         stock: values.stock,
         sku: values.sku?.trim() || undefined,
       });
-      toast.success("Variant added.");
+      notifySuccess("Variant added", "The new variant is now available in inventory.");
       onAdded(added);
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Failed to add variant."));
@@ -249,7 +250,7 @@ function EditVariantForm({
         stock: values.stock,
         sku: values.sku?.trim() || undefined,
       });
-      toast.success("Variant updated.");
+      notifySuccess("Variant updated", "Your changes were saved successfully.");
       onSaved(updated);
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Failed to update variant."));
@@ -324,7 +325,7 @@ export function VariantManager({
     try {
       await productsApi.deleteVariant(productId, variant.id);
       onVariantsChange(variants.filter((v) => v.id !== variant.id));
-      toast.success("Variant deleted.");
+      notifyDelete("Variant deleted", label ? `${label} was removed from this product.` : "The variant was removed from this product.");
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Failed to delete variant."));
     } finally {
