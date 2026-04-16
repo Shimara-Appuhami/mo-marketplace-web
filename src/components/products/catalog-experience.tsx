@@ -3,14 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition, type FormEvent } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  ChartNoAxesCombined,
-  PackageCheck,
-  PackageSearch,
-  Sparkles,
-  Warehouse,
-} from "lucide-react";
+import { LayoutGrid, Search, SlidersHorizontal, X } from "lucide-react";
 import { EmptyProductsState } from "@/components/products/empty-products-state";
 import { ProductCard } from "@/components/products/product-card";
 import { cn } from "@/lib/utils";
@@ -19,9 +12,9 @@ import type { Product } from "@/types";
 
 const sortOptions = [
   { label: "Newest first", value: "newest" },
-  { label: "Name A-Z", value: "name-asc" },
-  { label: "Price low-high", value: "price-asc" },
-  { label: "Price high-low", value: "price-desc" },
+  { label: "Name A–Z", value: "name-asc" },
+  { label: "Price ↑", value: "price-asc" },
+  { label: "Price ↓", value: "price-desc" },
 ];
 
 type CatalogExperienceProps = {
@@ -39,11 +32,8 @@ function getInventory(product: Product) {
 }
 
 function getStartingPrice(product: Product) {
-  if (!product.variants.length) {
-    return parsePrice(product.basePrice);
-  }
-
-  return Math.min(...product.variants.map((variant) => parsePrice(variant.price)));
+  if (!product.variants.length) return parsePrice(product.basePrice);
+  return Math.min(...product.variants.map((v) => parsePrice(v.price)));
 }
 
 export function CatalogExperience({ products, initialFilters }: CatalogExperienceProps) {
@@ -51,6 +41,8 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
   const [search, setSearch] = useState(initialFilters.q ?? "");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
   const category = initialFilters.category ?? "all";
   const availability = initialFilters.availability ?? "all";
   const sort = initialFilters.sort ?? "newest";
@@ -61,348 +53,248 @@ export function CatalogExperience({ products, initialFilters }: CatalogExperienc
 
   const categories = useMemo(
     () =>
-      Array.from(new Set(products.map((product) => product.category).filter(Boolean))).sort(
-        (left, right) => left.localeCompare(right)
+      Array.from(new Set(products.map((p) => p.category).filter(Boolean))).sort((a, b) =>
+        a.localeCompare(b)
       ),
     [products]
   );
 
   const filteredProducts = useMemo(() => {
-    const query = initialFilters.q?.trim().toLowerCase() ?? "";
-
+    const q = initialFilters.q?.trim().toLowerCase() ?? "";
     return [...products]
-      .filter((product) => {
-        const matchesQuery =
-          !query ||
-          [product.name, product.description, product.category]
+      .filter((p) => {
+        const matchesQ =
+          !q ||
+          [p.name, p.description, p.category]
             .filter(Boolean)
-            .some((field) => field.toLowerCase().includes(query));
-
-        const matchesCategory =
-          category === "all" ||
-          product.category.toLowerCase() === category.toLowerCase();
-
-        const stock = getInventory(product);
-        const matchesAvailability =
+            .some((f) => f.toLowerCase().includes(q));
+        const matchesCat =
+          category === "all" || p.category.toLowerCase() === category.toLowerCase();
+        const stock = getInventory(p);
+        const matchesAv =
           availability === "all" ||
           (availability === "in-stock" && stock > 0) ||
           (availability === "low-stock" && stock > 0 && stock <= 10) ||
           (availability === "out-of-stock" && stock <= 0);
-
-        return matchesQuery && matchesCategory && matchesAvailability;
+        return matchesQ && matchesCat && matchesAv;
       })
-      .sort((left, right) => {
-        if (sort === "name-asc") {
-          return left.name.localeCompare(right.name);
-        }
-
-        if (sort === "price-asc") {
-          return getStartingPrice(left) - getStartingPrice(right);
-        }
-
-        if (sort === "price-desc") {
-          return getStartingPrice(right) - getStartingPrice(left);
-        }
-
-        return (
-          new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
-        );
+      .sort((a, b) => {
+        if (sort === "name-asc") return a.name.localeCompare(b.name);
+        if (sort === "price-asc") return getStartingPrice(a) - getStartingPrice(b);
+        if (sort === "price-desc") return getStartingPrice(b) - getStartingPrice(a);
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
   }, [availability, category, initialFilters.q, products, sort]);
 
-  const summary = useMemo(() => {
-    const totalInventory = products.reduce((sum, product) => sum + getInventory(product), 0);
-    const activeProducts = products.filter((product) => getInventory(product) > 0).length;
-    const lowStockProducts = products.filter((product) => {
-      const stock = getInventory(product);
-      return stock > 0 && stock <= 10;
-    }).length;
-
-    return {
-      totalInventory,
-      activeProducts,
-      lowStockProducts,
-    };
-  }, [products]);
-
-  const updateSearchParams = (nextValues: Record<string, string>) => {
+  const updateParams = (next: Record<string, string>) => {
     const params = new URLSearchParams();
-
-    if (initialFilters.q) {
-      params.set("q", initialFilters.q);
-    }
-
-    if (initialFilters.category) {
-      params.set("category", initialFilters.category);
-    }
-
-    if (initialFilters.availability) {
-      params.set("availability", initialFilters.availability);
-    }
-
-    if (initialFilters.sort) {
-      params.set("sort", initialFilters.sort);
-    }
-
-    Object.entries(nextValues).forEach(([key, value]) => {
-      if (!value || value === "all" || (key === "sort" && value === "newest")) {
-        params.delete(key);
-        return;
-      }
-
-      params.set(key, value);
+    const merged: Record<string, string> = {
+      ...(initialFilters.q ? { q: initialFilters.q } : {}),
+      ...(initialFilters.category ? { category: initialFilters.category } : {}),
+      ...(initialFilters.availability ? { availability: initialFilters.availability } : {}),
+      ...(initialFilters.sort ? { sort: initialFilters.sort } : {}),
+      ...next,
+    };
+    Object.entries(merged).forEach(([k, v]) => {
+      if (v && v !== "all" && !(k === "sort" && v === "newest")) params.set(k, v);
     });
-
-    const queryString = params.toString();
-
+    const qs = params.toString();
     startTransition(() => {
-      router.replace(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false });
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     });
   };
 
-  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    updateSearchParams({ q: search.trim() });
+  const handleSearchSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    updateParams({ q: search.trim() });
   };
+
+  const clearAll = () => {
+    setSearch("");
+    startTransition(() => router.replace(pathname, { scroll: false }));
+  };
+
+  const hasActiveFilters =
+    !!initialFilters.q || category !== "all" || availability !== "all" || sort !== "newest";
 
   return (
-    <section className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-10">
-      <div className="overflow-hidden rounded-2xl border border-white/70 bg-[linear-gradient(135deg,rgba(15,23,42,0.98),rgba(26,36,66,0.96)_50%,rgba(8,145,178,0.78))] text-white shadow-[0_32px_80px_-44px_rgba(8,15,35,0.6)]">
-        <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.2fr_0.8fr] lg:p-10">
-          <div className="relative space-y-6">
-            <div className="absolute -left-10 top-0 h-28 w-28 rounded-full bg-cyan-300/15 blur-3xl" />
-            <span className="relative inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-100">
-              <Sparkles className="size-3.5" />
-              Marketplace Console
-            </span>
-            <div className="relative space-y-4">
-              <h1 className="max-w-3xl font-serif text-4xl leading-tight tracking-tight text-white sm:text-5xl">
-                Run a cleaner product catalog with search, stock signals, and faster buying.
-              </h1>
-              <p className="max-w-2xl text-sm leading-7 text-slate-200 sm:text-base">
-                Browse the marketplace, narrow results instantly, and move from discovery to
-                purchase or creation without losing context.
-              </p>
-            </div>
-
-            <form className="relative flex flex-col gap-3 sm:flex-row" onSubmit={handleSearchSubmit}>
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search by product, category, or description"
-                className="min-h-14 flex-1 rounded-full border border-white/15 bg-white/10 px-5 text-sm text-white outline-none backdrop-blur placeholder:text-slate-300 focus:border-cyan-300/60"
-              />
-              <button
-                type="submit"
-                className="inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-white px-6 text-sm font-semibold text-slate-950 transition hover:bg-cyan-50"
-              >
-                Search catalog
-                <ArrowRight className="size-4" />
-              </button>
-            </form>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-            <div className="rounded-lg border border-white/10 bg-white/10 p-5 backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-300">Products live</p>
-              <p className="mt-3 text-3xl font-semibold">{products.length}</p>
-              <p className="mt-2 text-sm text-slate-200">Total items currently synced from the API.</p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/10 p-5 backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-300">Inventory units</p>
-              <p className="mt-3 text-3xl font-semibold">{summary.totalInventory}</p>
-              <p className="mt-2 text-sm text-slate-200">Combined stock across all visible variants.</p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/10 p-5 backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-300">Low stock watch</p>
-              <p className="mt-3 text-3xl font-semibold">{summary.lowStockProducts}</p>
-              <p className="mt-2 text-sm text-slate-200">Products that may need replenishment soon.</p>
-            </div>
-          </div>
-        </div>
+    <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6">
+      {/* ── Page header ─────────────────────────────────────── */}
+      <div className="mb-8 space-y-3">
+        <span className="inline-block rounded bg-amber-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-amber-700">
+          Curated Collection
+        </span>
+        <h1 className="text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">
+          Premium Products.
+        </h1>
+        <p className="max-w-xl text-sm leading-6 text-slate-500">
+          Browse the full catalog, filter by category or stock level, and find exactly what you
+          need.
+        </p>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
-        <div className="space-y-6">
-          <div className="rounded-xl border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] backdrop-blur">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700">
-                  Catalog controls
-                </p>
-                <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-                  Refine the list instead of scrolling blind.
-                </h2>
-              </div>
-              <Link
-                href="/products/create"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-              >
-                Create product
-                <ArrowRight className="size-4" />
-              </Link>
-            </div>
+      {/* ── Category tabs + filter toggle ───────────────────── */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
+        <div className="flex flex-wrap items-center gap-1">
+          {/* All Items tab */}
+          <button
+            type="button"
+            onClick={() => updateParams({ category: "all" })}
+            className={cn(
+              "rounded-full px-4 py-1.5 text-sm font-medium transition",
+              category === "all"
+                ? "bg-slate-950 text-white"
+                : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+            )}
+          >
+            All Items
+          </button>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <label className="space-y-2">
-                <span className="text-sm font-medium text-slate-700">Category</span>
-                <select
-                  value={category}
-                  onChange={(event) => updateSearchParams({ category: event.target.value })}
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400"
-                >
-                  <option value="all">All categories</option>
-                  {categories.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="space-y-2">
-                <span className="text-sm font-medium text-slate-700">Availability</span>
-                <select
-                  value={availability}
-                  onChange={(event) => updateSearchParams({ availability: event.target.value })}
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400"
-                >
-                  <option value="all">All stock levels</option>
-                  <option value="in-stock">In stock</option>
-                  <option value="low-stock">Low stock</option>
-                  <option value="out-of-stock">Out of stock</option>
-                </select>
-              </label>
-
-              <label className="space-y-2">
-                <span className="text-sm font-medium text-slate-700">Sort by</span>
-                <select
-                  value={sort}
-                  onChange={(event) => updateSearchParams({ sort: event.target.value })}
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-cyan-400"
-                >
-                  {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setSearch("");
-                  startTransition(() => {
-                    router.replace(pathname, { scroll: false });
-                  });
-                }}
-                className="inline-flex items-center justify-center rounded-lg border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-950"
-              >
-                Reset filters
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-sm text-slate-600">
-              Showing <span className="font-semibold text-slate-950">{filteredProducts.length}</span>{" "}
-              of <span className="font-semibold text-slate-950">{products.length}</span> products
-            </p>
-            <div
+          {/* Dynamic category tabs */}
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => updateParams({ category: cat })}
               className={cn(
-                "rounded-full px-3 py-1.5 text-xs font-semibold",
-                isPending ? "bg-amber-100 text-amber-800" : "bg-emerald-100 text-emerald-800"
+                "rounded-full px-4 py-1.5 text-sm font-medium transition",
+                category === cat
+                  ? "bg-slate-950 text-white"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
               )}
             >
-              {isPending ? "Updating view..." : "Live filters ready"}
-            </div>
-          </div>
-
-          {filteredProducts.length === 0 ? (
-            <div className="space-y-4">
-              {products.length === 0 ? (
-                <EmptyProductsState />
-              ) : (
-                <div className="rounded-xl border border-dashed border-slate-300 bg-white/80 p-10 text-center shadow-[0_24px_60px_-48px_rgba(15,23,42,0.5)]">
-                  <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-cyan-100 text-cyan-800">
-                    <PackageSearch className="size-7" />
-                  </div>
-                  <h3 className="mt-5 text-2xl font-semibold tracking-tight text-slate-950">
-                    No products match these filters.
-                  </h3>
-                  <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-600">
-                    Try broadening the search term, switching categories, or clearing the stock
-                    filter to bring products back into view.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearch("");
-                      startTransition(() => {
-                        router.replace(pathname, { scroll: false });
-                      });
-                    }}
-                    className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-                  >
-                    Clear filters
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2 2xl:grid-cols-3">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          )}
+              {cat}
+            </button>
+          ))}
         </div>
 
-        <aside className="space-y-4">
-          <div className="rounded-xl border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_60px_-48px_rgba(15,23,42,0.55)] backdrop-blur">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-700">
-              Operations snapshot
-            </p>
-            <div className="mt-5 space-y-4">
-              <div className="flex items-start gap-4 rounded-lg bg-slate-50 p-4">
-                <div className="flex size-11 items-center justify-center rounded-full bg-cyan-100 text-cyan-800">
-                  <PackageCheck className="size-5" />
-                </div>
-                <div>
-                  <p className="font-semibold text-slate-950">{summary.activeProducts} active products</p>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
-                    Items with stock available for immediate quick-buy actions.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 rounded-lg bg-slate-50 p-4">
-                <div className="flex size-11 items-center justify-center rounded-full bg-amber-100 text-amber-800">
-                  <Warehouse className="size-5" />
-                </div>
-                <div>
-                  <p className="font-semibold text-slate-950">{summary.lowStockProducts} low stock alerts</p>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
-                    Products below the watch threshold of ten total units.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 rounded-lg bg-slate-50 p-4">
-                <div className="flex size-11 items-center justify-center rounded-full bg-emerald-100 text-emerald-800">
-                  <ChartNoAxesCombined className="size-5" />
-                </div>
-                <div>
-                  <p className="font-semibold text-slate-950">Catalog controls are shareable</p>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
-                    Search, filters, and sorting stay in the URL so teams can share the exact view.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
+        <div className="flex items-center gap-2">
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearAll}
+              className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
+            >
+              <X className="size-3" />
+              Clear
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((o) => !o)}
+            className={cn(
+              "inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition",
+              filtersOpen
+                ? "border-slate-950 bg-slate-950 text-white"
+                : "border-slate-300 text-slate-700 hover:border-slate-500"
+            )}
+          >
+            <SlidersHorizontal className="size-4" />
+            Filters
+          </button>
+          <Link
+            href="/products/create"
+            className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+          >
+            + New
+          </Link>
+        </div>
       </div>
+
+      {/* ── Expanded filter panel ────────────────────────────── */}
+      {filtersOpen && (
+        <div className="mb-6 grid gap-4 rounded-xl border border-slate-200 bg-white p-5 sm:grid-cols-[1fr_auto_auto_auto]">
+          {/* Search */}
+          <form onSubmit={handleSearchSubmit} className="relative">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search products…"
+              className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+            />
+          </form>
+
+          {/* Availability */}
+          <select
+            value={availability}
+            onChange={(e) => updateParams({ availability: e.target.value })}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-400"
+          >
+            <option value="all">All stock</option>
+            <option value="in-stock">In stock</option>
+            <option value="low-stock">Low stock</option>
+            <option value="out-of-stock">Out of stock</option>
+          </select>
+
+          {/* Sort */}
+          <select
+            value={sort}
+            onChange={(e) => updateParams({ sort: e.target.value })}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-400"
+          >
+            {sortOptions.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+
+          {/* Apply search */}
+          <button
+            type="button"
+            onClick={() => updateParams({ q: search.trim() })}
+            className="rounded-lg bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            Apply
+          </button>
+        </div>
+      )}
+
+      {/* ── Result meta bar ──────────────────────────────────── */}
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <p className="text-sm text-slate-500">
+          <span className="font-semibold text-slate-900">{filteredProducts.length}</span> of{" "}
+          <span className="font-semibold text-slate-900">{products.length}</span> products
+        </p>
+        <div
+          className={cn(
+            "flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold",
+            isPending ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-500"
+          )}
+        >
+          <LayoutGrid className="size-3" />
+          {isPending ? "Loading…" : "Live"}
+        </div>
+      </div>
+
+      {/* ── Product grid ─────────────────────────────────────── */}
+      {filteredProducts.length === 0 ? (
+        products.length === 0 ? (
+          <EmptyProductsState />
+        ) : (
+          <div className="rounded-xl border border-dashed border-slate-300 bg-white p-14 text-center">
+            <p className="text-lg font-semibold text-slate-900">No products match these filters.</p>
+            <p className="mt-2 text-sm text-slate-500">
+              Try changing the category or clearing the active filters.
+            </p>
+            <button
+              type="button"
+              onClick={clearAll}
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+            >
+              Clear filters
+            </button>
+          </div>
+        )
+      ) : (
+        <div className="grid gap-x-5 gap-y-8 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+          {filteredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
